@@ -1004,24 +1004,48 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// --- NEW: robust UI mapping helpers (fixes "missing info" showing as rejected) ---
+// --- UI mapping helpers ---
+// NOTE: FIX #2: if the backend explicitly rejects a candidate, we must show "Rejected" (red),
+// even if the backend also returns a "missingInfoList" (unmet requirements list).
 function normalizeConfidence(v) {
     if (typeof v !== "number") return 0;
     return v <= 1 ? Math.round(v * 100) : Math.round(v);
 }
 
 function deriveUiCategory(finalData) {
-    const decision = String(finalData.finalDecision || "").toLowerCase();
-    const atsStatus = String(finalData.atsStatus || (finalData.ats && finalData.ats.atsStatus) || "").toLowerCase();
+    const decisionRaw = String(finalData.finalDecision || "");
+    const decision = decisionRaw.toLowerCase();
+
+    const atsStatusRaw = String(finalData.atsStatus || (finalData.ats && finalData.ats.atsStatus) || "");
+    const atsStatus = atsStatusRaw.toLowerCase();
+
+    const rejectionCode = String(finalData.rejectionReasonCode || "").trim();
+    const hasRejectionSignal =
+        decision.includes("reject") ||
+        atsStatus.includes("reject") ||
+        rejectionCode.length > 0;
 
     const missing = finalData.missingInformation ?? finalData.missingInfoList ?? (finalData.scoreDetails && finalData.scoreDetails.missingInfo);
     const missingList = Array.isArray(missing)
         ? missing.filter(Boolean).map(x => String(x))
         : (missing ? [String(missing)] : []);
 
-    // Highest priority: Missing info / needs info
-    if (
+    const hasMissingSignal =
         missingList.length > 0 ||
+        atsStatus.includes("needsinfo") ||
+        atsStatus.includes("needs_info") ||
+        decision.includes("missing") ||
+        decision.includes("clarification") ||
+        decision.includes("needs info") ||
+        decision.includes("additional information") ||
+        decision.includes("follow-up") ||
+        decision.includes("follow up");
+
+    // Priority order:
+    // 1) Explicit "needs info" / "missing info" decisions => Missing
+    // 2) Explicit "reject" / rejectionReasonCode / ATS rejected => Rejected
+    // 3) Otherwise, if missing list exists => Missing
+    if (
         atsStatus.includes("needsinfo") ||
         atsStatus.includes("needs_info") ||
         decision.includes("missing") ||
@@ -1034,9 +1058,12 @@ function deriveUiCategory(finalData) {
         return { category: "missing", label: "⚠ Missing Information / Clarification Required", missingList };
     }
 
-    // Rejected
-    if (decision.includes("reject") || atsStatus.includes("reject")) {
+    if (hasRejectionSignal) {
         return { category: "rejected", label: "✗ Application Rejected", missingList };
+    }
+
+    if (hasMissingSignal) {
+        return { category: "missing", label: "⚠ Missing Information / Clarification Required", missingList };
     }
 
     // Interview / invited / approved
@@ -1053,20 +1080,13 @@ function deriveUiCategory(finalData) {
     // Fallback using score
     const score = typeof finalData.score === "number" ? finalData.score : 0;
     if (score >= 60) return { category: "approved", label: "✓ Interview with HR Scheduled", missingList };
-    if (missingList.length > 0) return { category: "missing", label: "⚠ Missing Information / Clarification Required", missingList };
     return { category: "rejected", label: "✗ Application Rejected", missingList };
 }
-// -------------------------------------------------------------------------------
 
-/* ===================== METRICS (NEW) ===================== */
+/* ===================== METRICS ===================== */
 function setMetricsStatus(kind, text) {
     metricsStatusEl.className = 'metrics-badge ' + (kind || 'warn');
     metricsStatusEl.textContent = text;
-}
-
-function fmtPct(p) {
-    if (typeof p !== "number" || Number.isNaN(p)) return "—";
-    return `${p}%`;
 }
 
 function safeText(id, value) {
@@ -1080,18 +1100,26 @@ function fmtCountWithPct(count, pct) {
     return String(count);
 }
 
+function fmtSeconds(v) {
+    if (typeof v !== "number" || Number.isNaN(v)) return "—";
+    // Show 2 decimals for small values, otherwise 1 decimal
+    if (v === 0) return "0s";
+    if (v < 10) return `${v.toFixed(2)}s`;
+    return `${v.toFixed(1)}s`;
+}
+
 async function refreshMetrics() {
     const windowHours = parseInt(metricsWindowEl.value || "24", 10) || 24;
 
     try {
         setMetricsStatus('warn', '⏳ Loading…');
 
-        // IMPORTANT: keep GET simple (no headers) to avoid CORS preflight
+        // IMPORTANT: keep GET simple (no extra headers) to avoid CORS preflight
         const r = await fetch(`${METRICS_BASE_URL}/metrics?windowHours=${encodeURIComponent(windowHours)}`);
         const data = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(data.error || "metrics failed");
 
-        // This metrics lambda returns top-level fields (NOT data.execution / data.decisions.totalApplicationsInWindow)
+        // Metrics lambda returns top-level fields
         const totalExecutions = typeof data.totalExecutions === "number" ? data.totalExecutions : 0;
         const succeeded = typeof data.succeeded === "number" ? data.succeeded : 0;
         const failed = typeof data.failed === "number" ? data.failed : 0;
@@ -1102,7 +1130,7 @@ async function refreshMetrics() {
         const avgExecTimeSeconds = typeof data.avgExecutionTimeSeconds === "number" ? data.avgExecutionTimeSeconds : 0;
         const throughput = typeof data.throughputExecutionsPerHour === "number" ? data.throughputExecutionsPerHour : 0;
 
-        // Decision buckets (based on SUCCEEDED executions where S3 final was readable)
+        // Decision buckets
         const decisions = data.decisions || {};
         const approved = decisions.approved || {};
         const missing = decisions.missingInfo || {};
@@ -1112,18 +1140,26 @@ async function refreshMetrics() {
         safeText("m_exec_succeeded", String(succeeded));
         safeText("m_exec_failed", String(failed));
         safeText("m_exec_timedout", String(timedOut));
-
         safeText("m_exec_aborted", String(aborted));
         safeText("m_success", `${successRatePercent}% (${succeeded}/${totalExecutions})`);
-        safeText("m_avgdur", `${avgExecTimeSeconds}s`);
+
+        // FIX #1 (frontend-side guard): if avg is 0 but we have succeeded executions,
+        // display "—" and put a helpful hint in Notes (this typically happens when
+        // DescribeExecution is failing in the metrics lambda IAM).
+        const avgLooksBroken = (avgExecTimeSeconds === 0 && succeeded > 0);
+        safeText("m_avgdur", avgLooksBroken ? "—" : fmtSeconds(avgExecTimeSeconds));
         safeText("m_tph", `${throughput} exec/hour`);
 
         safeText("m_approved", fmtCountWithPct(approved.count ?? 0, approved.percentOfDecided ?? 0));
         safeText("m_missing", fmtCountWithPct(missing.count ?? 0, missing.percentOfDecided ?? 0));
         safeText("m_rejected", fmtCountWithPct(rejected.count ?? 0, rejected.percentOfDecided ?? 0));
 
-        // You asked: remove the explanatory sentence; we only show notes if present
-        safeText("m_note", data?.notes ? String(data.notes) : "—");
+        let note = data?.notes ? String(data.notes) : "—";
+        if (avgLooksBroken) {
+            const hint = "Avg time is 0 because durations could not be computed. Check metrics Lambda IAM includes states:DescribeExecution.";
+            note = (note && note !== "—") ? `${note} • ${hint}` : hint;
+        }
+        safeText("m_note", note);
 
         // Badge logic
         if (totalExecutions === 0) {
@@ -1202,7 +1238,7 @@ async function runWorkflowVisualization(jobDescription, cv, screeningResponses) 
         statusElement.textContent = '✓ Completed';
     }
 
-    // --- REAL BACKEND CALL (replaces simulateWorkflow) ---
+    // --- REAL BACKEND CALL ---
     let startResp, startData;
     try {
         startResp = await fetch(`${API_BASE_URL}/start`, {
@@ -1251,7 +1287,6 @@ async function runWorkflowVisualization(jobDescription, cv, screeningResponses) 
             break;
         }
 
-        // expected backend field: applicationStatus
         if (sd.applicationStatus === "SUCCEEDED") {
             finalData = sd;
             break;
@@ -1263,16 +1298,20 @@ async function runWorkflowVisualization(jobDescription, cv, screeningResponses) 
         }
     }
 
-    // Map backend response into displayVerdict expected structure
     if (finalData) {
         const ui = deriveUiCategory(finalData);
 
-        const score = typeof finalData.score === "number" ? finalData.score : (finalData.scoreDetails && typeof finalData.scoreDetails.score === "number" ? finalData.scoreDetails.score : 0);
-        const conf = typeof finalData.confidence === "number" ? finalData.confidence : (finalData.scoreDetails && typeof finalData.scoreDetails.confidence === "number" ? finalData.scoreDetails.confidence : 0);
+        const score = typeof finalData.score === "number"
+            ? finalData.score
+            : (finalData.scoreDetails && typeof finalData.scoreDetails.score === "number" ? finalData.scoreDetails.score : 0);
+
+        const conf = typeof finalData.confidence === "number"
+            ? finalData.confidence
+            : (finalData.scoreDetails && typeof finalData.scoreDetails.confidence === "number" ? finalData.scoreDetails.confidence : 0);
 
         const result = {
             executionId: finalData.executionArn,
-            finalDecision: ui.label, // ensures correct color (yellow for missing)
+            finalDecision: ui.label, // determines color (green/yellow/red)
             rejectionReasonCode: finalData.rejectionReasonCode || null,
             scoreDetails: {
                 score: score ?? 0,
@@ -1285,7 +1324,7 @@ async function runWorkflowVisualization(jobDescription, cv, screeningResponses) 
 
         displayVerdict(result);
 
-        // NEW: refresh metrics after a run (best-effort)
+        // refresh metrics after a run (best-effort)
         refreshMetrics();
     } else {
         startButton.disabled = false;
@@ -1302,7 +1341,6 @@ function displayVerdict(result) {
 
     const fd = String(result.finalDecision || "");
 
-    // We now expect labels like: ✓ ... / ⚠ ... / ✗ ...
     if (fd.startsWith("✓")) {
         verdictClass = 'approved';
         verdictText = fd;
@@ -1333,7 +1371,7 @@ function displayVerdict(result) {
         </div>
         <div class="verdict-detail-row">
             <span class="verdict-label">Confidence</span>
-            <span class="verdict-value">${confidence}</span>
+            <span class="verdict-value">${confidence}%</span>
         </div>
         <div class="verdict-detail-row">
             <span class="verdict-label">Explanation</span>
