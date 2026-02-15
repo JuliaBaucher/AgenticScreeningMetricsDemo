@@ -623,7 +623,7 @@ footer {
                 </div>
 
                 <div class="right">
-                    <span class="small-muted">Auto-refresh: 15s</span>
+                    <span class="small-muted">Auto-refresh: 10 min</span>
                 </div>
             </div>
 
@@ -1180,7 +1180,7 @@ async function refreshMetrics() {
 
 // refresh on load + every 15s
 refreshMetrics();
-setInterval(refreshMetrics, 15000);
+setInterval(refreshMetrics, 600000);
 /* ===================== END METRICS ===================== */
 
 async function startWorkflow() {
