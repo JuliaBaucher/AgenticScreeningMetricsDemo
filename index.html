@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Screening Demo - High-Volume Hourly Hiring</title>
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    color: #e0e0e0;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #1a1a1a;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+}
+
+header {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+    padding: 40px;
+    text-align: center;
+    border-bottom: 2px solid #3a3a3a;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    color: #00d4ff;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+header h2 {
+    font-size: 1.2rem;
+    color: #888;
+    font-weight: 400;
+}
+
+section {
+    padding: 40px;
+}
+
+.context-section {
+    background: #222;
+    border-bottom: 1px solid #333;
+}
+
+.context-section h3 {
+    color: #00d4ff;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+}
+
+.context-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.context-item {
+    background: #2a2a2a;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #3a3a3a;
+}
+
+.context-item h4 {
+    color: #00d4ff;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.context-item p {
+    color: #ccc;
+    font-size: 0.95rem;
+}
+
+.equal-opportunity {
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.equal-opportunity p {
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* ----------------- METRICS UI (added) ----------------- */
+.metrics-section {
+    background: #171717;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.metrics-section h3 {
+    color: #00d4ff;
+    margin-bottom: 16px;
+    font-size: 1.5rem;
+}
+
+.metrics-toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.metrics-select {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border: 2px solid #3a3a3a;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.metrics-button {
+    background: #2a2a2a;
+    color: #00d4ff;
+    border: 2px solid #00d4ff;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.metrics-button:hover {
+    background: #00d4ff;
+    color: #000;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.metric-card {
+    background: #222;
+    border: 1px solid #3a3a3a;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.metric-title {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.metric-value {
+    color: #e0e0e0;
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.metric-sub {
+    color: #888;
+    font-size: 0.9rem;
+    margin-top: 6px;
+}
+
+.metrics-status {
+    color: #888;
+    font-size: 0.9rem;
+    margin-top: 12px;
+}
+/* ------------------------------------------------------ */
+
+.input-section h3 {
+    color: #00d4ff;
+    margin-bottom: 30px;
+    font-size: 1.5rem;
+}
+
+.input-group {
+    margin-bottom: 25px;
+}
+
+.input-group label {
+    display: block;
+    color: #aaa;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+textarea {
+    width: 100%;
+    background: #2a2a2a;
+    border: 2px solid #3a3a3a;
+    border-radius: 6px;
+    color: #e0e0e0;
+    padding: 15px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: all 0.3s ease;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #00d4ff;
+    background: #2d2d2d;
+}
+
+textarea::placeholder {
+    color: #666;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    margin-top: 40px;
+}
+
+.sample-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.scenario-select {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border: 2px solid #3a3a3a;
+    padding: 14px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 320px;
+}
+
+.scenario-select:hover {
+    border-color: #00d4ff;
+}
+
+.scenario-select:focus {
+    outline: none;
+    border-color: #00d4ff;
+    background: #2d2d2d;
+}
+
+.scenario-select option {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    padding: 10px;
+}
+
+.clear-button {
+    background: #2a2a2a;
+    color: #ff4444;
+    border: 2px solid #ff4444;
+    padding: 14px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clear-button:hover {
+    background: #ff4444;
+    color: #fff;
+}
+
+.primary-button {
+    background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+    color: #000;
+    border: none;
+    padding: 18px 60px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.primary-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+}
+
+.primary-button:disabled {
+    background: #444;
+    cursor: not-allowed;
+    box-shadow: none;
+    color: #666;
+}
+
+.secondary-button {
+    background: #2a2a2a;
+    color: #00d4ff;
+    border: 2px solid #00d4ff;
+    padding: 16px 40px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.secondary-button:hover {
+    background: #00d4ff;
+    color: #000;
+}
+
+.results-section {
+    background: #1a1a1a;
+    border-top: 2px solid #3a3a3a;
+}
+
+.results-section h3 {
+    color: #00d4ff;
+    margin-bottom: 30px;
+    font-size: 1.5rem;
+}
+
+.workflow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    background: #222;
+    border: 2px solid #3a3a3a;
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.step-item.active {
+    border-color: #00d4ff;
+    background: #1a2a2a;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.step-item.completed {
+    border-color: #00ff88;
+    background: #1a2a1a;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #3a3a3a;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-right: 20px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.step-item.active .step-number {
+    background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+    color: #000;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.step-item.completed .step-number {
+    background: #00ff88;
+    color: #000;
+}
+
+.step-item.completed .step-number::after {
+    content: '✓';
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 10px rgba(0, 212, 255, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.8); }
+}
+
+.step-content { flex: 1; }
+
+.step-content h4 {
+    color: #e0e0e0;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.step-item.active .step-content h4 { color: #00d4ff; }
+.step-item.completed .step-content h4 { color: #00ff88; }
+
+.step-status { color: #888; font-size: 0.95rem; margin: 0; }
+.step-item.active .step-status { color: #00d4ff; animation: pulse-text 1.5s ease-in-out infinite; }
+.step-item.completed .step-status { color: #00ff88; }
+
+@keyframes pulse-text {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.verdict-section {
+    background: #1a1a1a;
+    border: 3px solid #00d4ff;
+    border-radius: 12px;
+    padding: 40px;
+    margin: 40px 0;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.verdict-section h3 {
+    color: #00d4ff;
+    font-size: 2rem;
+    margin-bottom: 30px;
+    letter-spacing: 3px;
+}
+
+.final-verdict {
+    font-size: 2rem;
+    font-weight: 700;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.final-verdict.approved {
+    color: #00ff88;
+    background: rgba(0, 255, 136, 0.1);
+    border: 3px solid #00ff88;
+}
+
+.final-verdict.additional-info {
+    color: #ffa500;
+    background: rgba(255, 165, 0, 0.1);
+    border: 3px solid #ffa500;
+}
+
+.final-verdict.rejected {
+    color: #ff4444;
+    background: rgba(255, 68, 68, 0.1);
+    border: 3px solid #ff4444;
+}
+
+.verdict-details {
+    background: #222;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.verdict-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    border-bottom: 1px solid #3a3a3a;
+    gap: 20px;
+}
+
+.verdict-detail-row:last-child { border-bottom: none; }
+
+.verdict-label {
+    color: #aaa;
+    font-weight: 500;
+    flex: 0 0 180px;
+    text-align: left;
+}
+
+.verdict-value {
+    color: #e0e0e0;
+    font-weight: 600;
+    flex: 1;
+    text-align: right;
+    word-break: break-word;
+}
+
+.rejection-code {
+    background: rgba(255, 68, 68, 0.1);
+    border: 2px solid #ff4444;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.rejection-code h4 { color: #ff4444; margin-bottom: 10px; }
+.rejection-code p {
+    color: #ff8888;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+footer {
+    background: #0a0a0a;
+    padding: 30px;
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+    border-top: 1px solid #2a2a2a;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Agentic Screening Demo</h1>
+            <h2>High-Volume Hourly Hiring</h2>
+        </header>
+
+        <section class="context-section">
+            <h3>Prototype Context</h3>
+            <div class="context-grid">
+                <div class="context-item">
+                    <h4>📊 Scale</h4>
+                    <p>10,000+ applications per week across 50+ locations</p>
+                </div>
+                <div class="context-item">
+                    <h4>🎯 Objective</h4>
+                    <p>Identify qualified candidates and move them through the funnel quickly</p>
+                </div>
+                <div class="context-item">
+                    <h4>⚖️ Constraints</h4>
+                    <p>Fair hiring, auditability, candidate experience</p>
+                </div>
+                <div class="context-item">
+                    <h4>📡 Available Signals</h4>
+                    <p>CV, screening answers, job description, historical outcomes, scheduling system, ATS</p>
+                </div>
+            </div>
+
+            <div class="equal-opportunity">
+                <p><strong>Equal Opportunity Statement:</strong> We are committed to non-discrimination across educational background, gender identity and expression, sexual orientation, religion, ethnicity, age, socioeconomic status, disability, and veteran status.</p>
+            </div>
+        </section>
+
+        <!-- METRICS SECTION (added, does not affect the rest) -->
+        <section class="metrics-section">
+            <h3>Operational Metrics</h3>
+
+            <div class="metrics-toolbar">
+                <select id="metricsWindow" class="metrics-select">
+                    <option value="1">Last 1 hour</option>
+                    <option value="6">Last 6 hours</option>
+                    <option value="24" selected>Last 24 hours</option>
+                    <option value="168">Last 7 days</option>
+                </select>
+                <button id="refreshMetricsButton" class="metrics-button">Refresh metrics</button>
+                <div id="metricsStatus" class="metrics-status">Loading…</div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title">Avg end-to-end duration</div>
+                    <div id="m_avgDuration" class="metric-value">—</div>
+                    <div class="metric-sub">Seconds (Step Functions ExecutionTime)</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-title">Success rate</div>
+                    <div id="m_successRate" class="metric-value">—</div>
+                    <div class="metric-sub">Succeeded / Started</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-title">Throughput</div>
+                    <div id="m_throughput" class="metric-value">—</div>
+                    <div class="metric-sub">Executions started per hour</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-title">Approved</div>
+                    <div id="m_approved" class="metric-value">—</div>
+                    <div id="m_approvedSub" class="metric-sub">—</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-title">Missing Info</div>
+                    <div id="m_missing" class="metric-value">—</div>
+                    <div id="m_missingSub" class="metric-sub">—</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-title">Rejected</div>
+                    <div id="m_rejected" class="metric-value">—</div>
+                    <div id="m_rejectedSub" class="metric-sub">—</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="input-section">
+            <h3>Application Inputs</h3>
+
+            <div class="input-group">
+                <label for="jobDescription">Job Description</label>
+                <textarea id="jobDescription" rows="6" placeholder="Enter the job description including requirements, responsibilities, and qualifications..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label for="candidateCV">Candidate CV / Resume</label>
+                <textarea id="candidateCV" rows="8" placeholder="Paste candidate's CV or resume here..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label for="screeningResponses">Screening Question Responses</label>
+                <textarea id="screeningResponses" rows="6" placeholder="Paste candidate's responses to screening questions..."></textarea>
+            </div>
+
+            <div class="button-container">
+                <button id="startButton" class="primary-button">START DEMO</button>
+                <div class="sample-controls">
+                    <select id="sampleScenario" class="scenario-select">
+                        <option value="">Choose Sample Scenario...</option>
+                        <option value="approved">✓ Interview with HR Scheduled</option>
+                        <option value="missing">⚠ Missing Information / Clarification Required</option>
+                        <option value="rejected">✗ Application Rejected</option>
+                    </select>
+                    <button id="loadSampleButton" class="secondary-button">Load Sample Data</button>
+                    <button id="clearButton" class="clear-button">Clear All</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="resultsSection" class="results-section" style="display: none;">
+            <h3>Workflow Execution</h3>
+
+            <div id="workflowSteps" class="workflow-steps">
+                <div class="step-item" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Load Job Context</h4>
+                        <p class="step-status">Waiting...</p>
+                    </div>
+                </div>
+                <div class="step-item" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Ingest Application</h4>
+                        <p class="step-status">Waiting...</p>
+                    </div>
+                </div>
+                <div class="step-item" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Normalize & Dedupe</h4>
+                        <p class="step-status">Waiting...</p>
+                    </div>
+                </div>
+                <div class="step-item" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Structured Extraction</h4>
+                        <p class="step-status">Waiting...</p>
+                    </div>
+                </div>
+                <div class="step-item" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Fit Scoring</h4>
+                        <p class="step-status">Waiting...</p>
+                    </div>
+                </div>
+                <div class="step-item" data-step="6">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>Next-Best-Action</h4>
+                        <p class="step-status">Waiting...</p>
+                    </div>
+                </div>
+                <div class="step-item" data-step="7">
+                    <div class="step-number">7</div>
+                    <div class="step-content">
+                        <h4>Execute Actions</h4>
+                        <p class="step-status">Waiting...</p>
+                    </div>
+                </div>
+                <div class="step-item" data-step="8">
+                    <div class="step-number">8</div>
+                    <div class="step-content">
+                        <h4>Measure Outcomes</h4>
+                        <p class="step-status">Waiting...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="verdictSection" class="verdict-section" style="display: none;">
+                <h3>APPLICATION STATUS</h3>
+                <div id="finalVerdict" class="final-verdict"></div>
+                <div id="verdictDetails" class="verdict-details"></div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Agentic AI Systems Prototype • Cloud-Agnostic Architecture • File-Based Storage • In-Memory Workflow Orchestration</p>
+        </footer>
+    </div>
+
+    <script>
+/**
+ * Enhanced version:
+ * - Keeps your workflow UI logic untouched
+ * - Adds a separate metrics fetch from a Metrics Lambda
+ */
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// CONFIG
+// 1) API Lambda v2 Function URL (start/status)
+const API_BASE_URL = "PASTE_API_LAMBDA_V2_FUNCTION_URL_HERE".replace(/\/$/, "");
+
+// 2) Metrics Lambda Function URL (metrics)
+const METRICS_BASE_URL = "PASTE_METRICS_LAMBDA_FUNCTION_URL_HERE".replace(/\/$/, "");
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+const SAMPLE_SCENARIOS = {
+    approved: {
+        jobDescription: `Warehouse Associate - Forklift Operator
+
+Location: Distribution Center - Multiple Locations Available
+
+We are seeking experienced Warehouse Associates with forklift certification to join our growing team.
+
+Key Responsibilities:
+- Operate forklift safely to move inventory throughout the warehouse
+- Load and unload delivery trucks
+- Pick, pack, and ship customer orders accurately
+- Maintain organized inventory storage areas
+
+Requirements (Must Have):
+- Valid forklift certification (required)
+- Minimum 6 months warehouse experience
+- Ability to lift up to 50 lbs regularly
+- Available for full-time shifts including weekends
+
+Nice to Have:
+- Experience with warehouse management systems
+- Team leadership experience
+- Bilingual (English/Spanish)`,
+        candidateCV: `John Martinez
+Email: jmartinez@email.com | Phone: (555) 123-4567
+
+WORK EXPERIENCE
+
+Warehouse Team Member | FastShip Logistics | March 2022 - Present (2 years)
+- Operate sit-down and stand-up forklifts daily to move pallets and products
+- Load and unload 20+ delivery trucks per shift
+- Maintain 99.5% order accuracy rate for picking and packing
+- Certified forklift operator since June 2022
+- Cross-trained in shipping, receiving, and inventory management
+- Recognized as Employee of the Month twice in 2023
+
+Retail Associate | MegaMart | June 2020 - March 2022
+- Managed stock replenishment and inventory organization
+- Operated pallet jack for backroom operations
+
+CERTIFICATIONS
+- OSHA Forklift Operator Certification (Valid through 2026)
+- OSHA 10-Hour General Industry Safety
+- CPR/First Aid Certified
+
+SKILLS
+- Forklift operation (sit-down, stand-up, reach truck)
+- Warehouse management systems (WMS)
+- Inventory management
+- Team collaboration
+- Bilingual: English and Spanish (fluent)`,
+        screeningResponses: `1. Do you have a valid forklift certification?
+Yes, I have been OSHA certified since June 2022 and my certification is current through 2026.
+
+2. How many months/years of warehouse experience do you have?
+I have 2 years of warehouse experience at FastShip Logistics where I work currently.
+
+3. Can you lift up to 50 lbs regularly?
+Yes, I can lift 50 lbs regularly. I do this daily in my current warehouse position.
+
+4. What is your availability? Can you work weekends?
+I am available for full-time work and can work all shifts including weekends. I have experience working rotating shifts and am flexible with scheduling.`
+    },
+
+    missing: {
+        jobDescription: `Customer Service Representative
+
+We are looking for a friendly and professional Customer Service Representative to join our team.
+
+Requirements (Must Have):
+- High school diploma or equivalent
+- 1+ years customer service experience
+- Excellent communication skills
+- Professional phone etiquette
+- Computer proficiency (Microsoft Office, CRM systems)
+- Available for evening and weekend shifts
+
+Nice to Have:
+- Call center experience
+- Bilingual capabilities
+- Experience with Zendesk or similar ticketing systems`,
+        candidateCV: `Sarah Johnson
+Email: sjohnson@email.com
+
+WORK EXPERIENCE
+
+Sales Associate | Retail Store | 2023 - Present
+- Assist customers with product selection
+- Process transactions and handle returns
+- Maintained positive customer relationships
+
+EDUCATION
+High School Diploma | Central High School | 2022
+
+SKILLS
+- Friendly and outgoing personality
+- Good with people
+- Fast learner`,
+        screeningResponses: `1. How many years of customer service experience do you have?
+I have about 1 year working in retail, helping customers find products.
+
+2. Are you comfortable using computer systems and software?
+Yes, I use the cash register system at work. I'm familiar with basic computer use.
+
+3. What is your availability?
+I can work most days, but I need to check my current schedule. I might need some flexibility for the first month.`
+    },
+
+    rejected: {
+        jobDescription: `Senior Software Engineer - Backend
+
+We are seeking an experienced Backend Engineer to join our engineering team.
+
+Requirements (Must Have):
+- Bachelor's degree in Computer Science or related field
+- 5+ years professional software development experience
+- Strong proficiency in Java, Python, or Go
+- Experience with RESTful APIs and microservices architecture
+- Database design and optimization experience (PostgreSQL, MySQL)
+- Cloud platform experience (AWS, GCP, or Azure)
+- Strong understanding of data structures and algorithms
+
+Nice to Have:
+- Experience with Kubernetes and Docker
+- Contributions to open-source projects
+- Experience with distributed systems`,
+        candidateCV: `Michael Chen
+Email: mchen@email.com
+
+EDUCATION
+Bachelor of Arts in English Literature | State University | 2021
+
+WORK EXPERIENCE
+
+Content Writer | Marketing Agency | 2021 - 2023
+- Wrote blog posts and marketing content
+- Conducted research on various topics
+- Edited and proofread materials
+
+Freelance Writer | Self-employed | 2023 - Present
+- Create content for various clients
+- Manage multiple projects
+
+SKILLS
+- Strong writing and communication skills
+- Research abilities
+- Deadline-oriented
+- Microsoft Word, Google Docs
+- Basic HTML knowledge from personal blog`,
+        screeningResponses: `1. How many years of professional software development experience do you have?
+I don't have formal software development experience, but I'm very interested in learning. I've been teaching myself to code through online courses for the past 3 months.
+
+2. What programming languages are you proficient in?
+I'm currently learning Python through Codecademy. I've completed about 40% of the beginner course. I also know basic HTML from setting up my personal blog.
+
+3. Do you have experience with cloud platforms like AWS or Azure?
+I've heard of AWS but haven't used it yet. I'm willing to learn whatever is needed for the role.`
+    }
+};
+
+// DOM elements
+const startButton = document.getElementById('startButton');
+const loadSampleButton = document.getElementById('loadSampleButton');
+const clearButton = document.getElementById('clearButton');
+const scenarioSelect = document.getElementById('sampleScenario');
+const resultsSection = document.getElementById('resultsSection');
+const verdictSection = document.getElementById('verdictSection');
+const finalVerdictEl = document.getElementById('finalVerdict');
+const verdictDetailsEl = document.getElementById('verdictDetails');
+
+const jobDescriptionInput = document.getElementById('jobDescription');
+const candidateCVInput = document.getElementById('candidateCV');
+const screeningResponsesInput = document.getElementById('screeningResponses');
+
+// Metrics DOM
+const metricsWindowEl = document.getElementById("metricsWindow");
+const refreshMetricsButton = document.getElementById("refreshMetricsButton");
+const metricsStatusEl = document.getElementById("metricsStatus");
+
+const mAvgDuration = document.getElementById("m_avgDuration");
+const mSuccessRate = document.getElementById("m_successRate");
+const mThroughput = document.getElementById("m_throughput");
+const mApproved = document.getElementById("m_approved");
+const mApprovedSub = document.getElementById("m_approvedSub");
+const mMissing = document.getElementById("m_missing");
+const mMissingSub = document.getElementById("m_missingSub");
+const mRejected = document.getElementById("m_rejected");
+const mRejectedSub = document.getElementById("m_rejectedSub");
+
+// Event listeners
+startButton.addEventListener('click', startWorkflow);
+loadSampleButton.addEventListener('click', loadSampleData);
+clearButton.addEventListener('click', clearAllFields);
+
+refreshMetricsButton.addEventListener("click", () => refreshMetrics(true));
+metricsWindowEl.addEventListener("change", () => refreshMetrics(true));
+
+function clearAllFields() {
+    jobDescriptionInput.value = '';
+    candidateCVInput.value = '';
+    screeningResponsesInput.value = '';
+    scenarioSelect.value = '';
+
+    resultsSection.style.display = 'none';
+    verdictSection.style.display = 'none';
+
+    startButton.disabled = false;
+    startButton.textContent = 'START DEMO';
+
+    clearButton.textContent = '✓ Cleared';
+    setTimeout(() => { clearButton.textContent = 'Clear All'; }, 1500);
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function loadSampleData() {
+    const scenario = scenarioSelect.value;
+    if (!scenario) {
+        alert('Please select a scenario from the dropdown first!');
+        return;
+    }
+    const sampleData = SAMPLE_SCENARIOS[scenario];
+    jobDescriptionInput.value = sampleData.jobDescription;
+    candidateCVInput.value = sampleData.candidateCV;
+    screeningResponsesInput.value = sampleData.screeningResponses;
+
+    const scenarioName = scenarioSelect.options[scenarioSelect.selectedIndex].text;
+    loadSampleButton.textContent = '✓ Loaded: ' + scenarioName;
+    setTimeout(() => { loadSampleButton.textContent = 'Load Sample Data'; }, 3000);
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// --- UI mapping helpers (unchanged) ---
+function normalizeConfidence(v) {
+    if (typeof v !== "number") return 0;
+    return v <= 1 ? Math.round(v * 100) : Math.round(v);
+}
+
+function deriveUiCategory(finalData) {
+    const decision = String(finalData.finalDecision || "").toLowerCase();
+    const atsStatus = String(finalData.atsStatus || (finalData.ats && finalData.ats.atsStatus) || "").toLowerCase();
+
+    const missing = finalData.missingInformation ?? finalData.missingInfoList ?? (finalData.scoreDetails && finalData.scoreDetails.missingInfo);
+    const missingList = Array.isArray(missing)
+        ? missing.filter(Boolean).map(x => String(x))
+        : (missing ? [String(missing)] : []);
+
+    if (
+        missingList.length > 0 ||
+        atsStatus.includes("needsinfo") ||
+        atsStatus.includes("needs_info") ||
+        decision.includes("missing") ||
+        decision.includes("clarification") ||
+        decision.includes("needs info") ||
+        decision.includes("additional information") ||
+        decision.includes("follow-up") ||
+        decision.includes("follow up")
+    ) {
+        return { category: "missing", label: "⚠ Missing Information / Clarification Required", missingList };
+    }
+
+    if (decision.includes("reject") || atsStatus.includes("reject")) {
+        return { category: "rejected", label: "✗ Application Rejected", missingList };
+    }
+
+    if (
+        decision.includes("interview") ||
+        decision.includes("schedule") ||
+        decision.includes("invite") ||
+        decision.includes("approved") ||
+        atsStatus.includes("invited")
+    ) {
+        return { category: "approved", label: "✓ Interview with HR Scheduled", missingList };
+    }
+
+    const score = typeof finalData.score === "number" ? finalData.score : 0;
+    if (score >= 60) return { category: "approved", label: "✓ Interview with HR Scheduled", missingList };
+    if (missingList.length > 0) return { category: "missing", label: "⚠ Missing Information / Clarification Required", missingList };
+    return { category: "rejected", label: "✗ Application Rejected", missingList };
+}
+// --------------------------------------
+
+async function startWorkflow() {
+    const jobDescription = jobDescriptionInput.value.trim();
+    const cv = candidateCVInput.value.trim();
+    const screeningResponses = screeningResponsesInput.value.trim();
+
+    if (!jobDescription || !cv || !screeningResponses) {
+        alert('Please fill in all three input fields before starting the demo.');
+        return;
+    }
+
+    startButton.disabled = true;
+    startButton.textContent = 'Processing...';
+
+    resultsSection.style.display = 'block';
+    verdictSection.style.display = 'none';
+
+    const allSteps = document.querySelectorAll('.step-item');
+    allSteps.forEach(step => {
+        step.classList.remove('active', 'completed');
+        const status = step.querySelector('.step-status');
+        status.textContent = 'Waiting...';
+    });
+
+    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    await runWorkflowVisualization(jobDescription, cv, screeningResponses);
+}
+
+async function runWorkflowVisualization(jobDescription, cv, screeningResponses) {
+    const steps = [
+        { step: 1, duration: 600 },
+        { step: 2, duration: 500 },
+        { step: 3, duration: 400 },
+        { step: 4, duration: 800 },
+        { step: 5, duration: 700 },
+        { step: 6, duration: 600 },
+        { step: 7, duration: 800 },
+        { step: 8, duration: 500 }
+    ];
+
+    for (let i = 0; i < steps.length; i++) {
+        const stepInfo = steps[i];
+        const stepElement = document.querySelector(`.step-item[data-step="${stepInfo.step}"]`);
+        const statusElement = stepElement.querySelector('.step-status');
+
+        stepElement.classList.add('active');
+        statusElement.textContent = 'Processing...';
+
+        await sleep(stepInfo.duration);
+
+        stepElement.classList.remove('active');
+        stepElement.classList.add('completed');
+        statusElement.textContent = '✓ Completed';
+    }
+
+    let startResp, startData;
+    try {
+        startResp = await fetch(`${API_BASE_URL}/start`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+                jobDescription,
+                candidateCV: cv,
+                screeningResponses
+            })
+        });
+        startData = await startResp.json();
+    } catch (e) {
+        alert("Backend error: failed to reach API. Check CORS / URL.\n\n" + (e && e.message ? e.message : String(e)));
+        startButton.disabled = false;
+        startButton.textContent = "START DEMO";
+        return;
+    }
+
+    if (!startResp.ok) {
+        alert("Backend error: " + (startData.error || "Failed to start"));
+        startButton.disabled = false;
+        startButton.textContent = "START DEMO";
+        return;
+    }
+
+    const executionArn = startData.executionArn;
+    const applicationId = startData.applicationId;
+
+    let finalData = null;
+    for (;;) {
+        await sleep(1500);
+
+        let st, sd;
+        try {
+            st = await fetch(`${API_BASE_URL}/status?executionArn=${encodeURIComponent(executionArn)}&applicationId=${encodeURIComponent(applicationId)}`);
+            sd = await st.json();
+        } catch (e) {
+            alert("Status error: failed to reach API.\n\n" + (e && e.message ? e.message : String(e)));
+            break;
+        }
+
+        if (!st.ok) {
+            alert("Status error: " + (sd.error || "Failed status"));
+            break;
+        }
+
+        if (sd.applicationStatus === "SUCCEEDED") {
+            finalData = sd;
+            break;
+        }
+
+        if (["FAILED", "TIMED_OUT", "ABORTED"].includes(sd.applicationStatus)) {
+            alert("Workflow failed: " + (sd.errorMessage || sd.applicationStatus));
+            break;
+        }
+    }
+
+    if (finalData) {
+        const ui = deriveUiCategory(finalData);
+
+        const score = typeof finalData.score === "number" ? finalData.score : 0;
+        const conf = typeof finalData.confidence === "number" ? finalData.confidence : 0;
+
+        const result = {
+            executionId: finalData.executionArn,
+            finalDecision: ui.label,
+            rejectionReasonCode: finalData.rejectionReasonCode || null,
+            scoreDetails: {
+                score: score ?? 0,
+                scoreBand: (score >= 75 ? "high" : score >= 50 ? "medium" : "low"),
+                confidence: normalizeConfidence(conf ?? 0),
+                explanation: finalData.explanation || "",
+                missingInfo: ui.missingList
+            }
+        };
+
+        displayVerdict(result);
+
+        // Refresh metrics after a completed run (nice UX)
+        refreshMetrics(true);
+    } else {
+        startButton.disabled = false;
+        startButton.textContent = "START DEMO";
+    }
+}
+
+function displayVerdict(result) {
+    verdictSection.style.display = 'block';
+    verdictSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    let verdictClass = '';
+    let verdictText = '';
+
+    const fd = String(result.finalDecision || "");
+
+    if (fd.startsWith("✓")) {
+        verdictClass = 'approved';
+        verdictText = fd;
+    } else if (fd.startsWith("⚠")) {
+        verdictClass = 'additional-info';
+        verdictText = fd;
+    } else if (fd.startsWith("✗") || fd.toLowerCase().includes('rejected')) {
+        verdictClass = 'rejected';
+        verdictText = fd.startsWith("✗") ? fd : '✗ Application Rejected';
+    } else {
+        verdictClass = 'additional-info';
+        verdictText = fd || '⚠ Missing Information / Clarification Required';
+    }
+
+    finalVerdictEl.textContent = verdictText;
+    finalVerdictEl.className = `final-verdict ${verdictClass}`;
+
+    const score = result.scoreDetails && typeof result.scoreDetails.score === "number" ? result.scoreDetails.score : 0;
+    const band = result.scoreDetails && result.scoreDetails.scoreBand ? String(result.scoreDetails.scoreBand).toUpperCase() : "LOW";
+    const confidence = result.scoreDetails && typeof result.scoreDetails.confidence === "number" ? result.scoreDetails.confidence : 0;
+    const explanation = result.scoreDetails && result.scoreDetails.explanation ? String(result.scoreDetails.explanation) : "";
+    const missingInfo = result.scoreDetails && Array.isArray(result.scoreDetails.missingInfo) ? result.scoreDetails.missingInfo : [];
+
+    let detailsHTML = `
+        <div class="verdict-detail-row">
+            <span class="verdict-label">Score</span>
+            <span class="verdict-value">${score}/100 (${band})</span>
+        </div>
+        <div class="verdict-detail-row">
+            <span class="verdict-label">Confidence</span>
+            <span class="verdict-value">${confidence}</span>
+        </div>
+        <div class="verdict-detail-row">
+            <span class="verdict-label">Explanation</span>
+            <span class="verdict-value">${explanation}</span>
+        </div>
+    `;
+
+    if (missingInfo.length > 0) {
+        detailsHTML += `
+            <div class="verdict-detail-row">
+                <span class="verdict-label">Missing Information</span>
+                <span class="verdict-value">${missingInfo.join(', ')}</span>
+            </div>
+        `;
+    }
+
+    detailsHTML += `
+        <div class="verdict-detail-row">
+            <span class="verdict-label">Execution ID</span>
+            <span class="verdict-value" style="font-family: monospace;">${String(result.executionId || "")}</span>
+        </div>
+    `;
+
+    verdictDetailsEl.innerHTML = detailsHTML;
+
+    if (result.rejectionReasonCode) {
+        verdictDetailsEl.innerHTML += `
+            <div class="rejection-code">
+                <h4>Rejection Reason Code</h4>
+                <p>${result.rejectionReasonCode}</p>
+            </div>
+        `;
+    }
+
+    startButton.disabled = false;
+    startButton.textContent = 'START DEMO';
+}
+
+/* ---------------- METRICS FETCH (added, isolated) ---------------- */
+
+function fmtPct(p) {
+    return `${p.toFixed(1)}%`;
+}
+
+function fmtFrac(part, total) {
+    return `${part}/${total}`;
+}
+
+async function refreshMetrics(showErrors) {
+    const windowHours = parseInt(metricsWindowEl.value || "24", 10);
+
+    metricsStatusEl.textContent = "Loading…";
+
+    try {
+        const resp = await fetch(`${METRICS_BASE_URL}/metrics?windowHours=${encodeURIComponent(windowHours)}`, {
+            method: "GET",
+            headers: { "content-type": "application/json" }
+        });
+
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || "Metrics request failed");
+
+        const exec = data.execution || {};
+        const dec = data.decisions || {};
+
+        // Avg duration
+        mAvgDuration.textContent = (exec.avgEndToEndSeconds != null) ? `${exec.avgEndToEndSeconds}` : "—";
+
+        // Success rate
+        const sr = (exec.successRate != null) ? (exec.successRate * 100.0) : 0;
+        mSuccessRate.textContent = `${sr.toFixed(1)}%`;
+        mSuccessRate.title = `Succeeded ${exec.succeeded || 0} / Started ${exec.started || 0}`;
+
+        // Throughput
+        mThroughput.textContent = (exec.throughputPerHour != null) ? `${exec.throughputPerHour}` : "—";
+
+        // Decisions (Approved/Missing/Rejected)
+        const dTotal = dec.total || 0;
+
+        const a = (dec.approved && dec.approved.count) || 0;
+        const ap = (dec.approved && dec.approved.pct) || 0;
+        mApproved.textContent = `${ap.toFixed(1)}%`;
+        mApprovedSub.textContent = `${fmtFrac(a, dTotal)} Approved`;
+
+        const m = (dec.missingInfo && dec.missingInfo.count) || 0;
+        const mp = (dec.missingInfo && dec.missingInfo.pct) || 0;
+        mMissing.textContent = `${mp.toFixed(1)}%`;
+        mMissingSub.textContent = `${fmtFrac(m, dTotal)} Missing Info`;
+
+        const r = (dec.rejected && dec.rejected.count) || 0;
+        const rp = (dec.rejected && dec.rejected.pct) || 0;
+        mRejected.textContent = `${rp.toFixed(1)}%`;
+        mRejectedSub.textContent = `${fmtFrac(r, dTotal)} Rejected`;
+
+        metricsStatusEl.textContent = `Updated • window: last ${data.windowHours}h`;
+    } catch (e) {
+        metricsStatusEl.textContent = "Metrics unavailable (check Metrics URL / CORS / IAM)";
+        if (showErrors) {
+            alert("Metrics error: " + (e && e.message ? e.message : String(e)));
+        }
+    }
+}
+
+// Auto-refresh every 15s (safe: read-only)
+refreshMetrics(false);
+setInterval(() => refreshMetrics(false), 15000);
+
+/* --------------------------------------------------------------- */
+
+// Initialize
+console.log('🚀 Agentic Hiring Demo - Frontend Loaded');
+console.log('💡 Click "Load Sample Data" then "START DEMO" to see the workflow in action');
+    </script>
+</body>
+</html>
