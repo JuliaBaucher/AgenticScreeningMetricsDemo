@@ -89,6 +89,86 @@ section {
     font-size: 0.95rem;
 }
 
+/* ===== Metrics styles (reuses your context cards) ===== */
+.metrics-section {
+    background: #222;
+    border-bottom: 1px solid #333;
+}
+.metrics-toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin: 10px 0 20px 0;
+}
+.metrics-toolbar .left,
+.metrics-toolbar .right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.metrics-select {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border: 2px solid #3a3a3a;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 180px;
+}
+.metrics-select:hover,
+.metrics-select:focus {
+    border-color: #00d4ff;
+    outline: none;
+}
+.metrics-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    border: 1px solid #3a3a3a;
+    background: #2a2a2a;
+    color: #ccc;
+}
+.metrics-badge.ok {
+    border-color: rgba(0, 255, 136, 0.35);
+    background: rgba(0, 255, 136, 0.08);
+    color: #bfffe0;
+}
+.metrics-badge.warn {
+    border-color: rgba(255, 165, 0, 0.35);
+    background: rgba(255, 165, 0, 0.08);
+    color: #ffe2b8;
+}
+.metrics-badge.err {
+    border-color: rgba(255, 68, 68, 0.35);
+    background: rgba(255, 68, 68, 0.08);
+    color: #ffbcbc;
+}
+.metrics-mini {
+    color: #888;
+    font-size: 0.9rem;
+}
+.small-muted {
+    color: #888;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+/* Make metric values pop a bit */
+.metric-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #eaeaea;
+}
+/* ===== End metrics styles ===== */
+
 .equal-opportunity {
     background: #2a2a2a;
     border: 1px solid #3a3a3a;
@@ -102,92 +182,6 @@ section {
     font-size: 0.95rem;
     line-height: 1.6;
 }
-
-/* ----------------- METRICS UI (added) ----------------- */
-.metrics-section {
-    background: #171717;
-    border-bottom: 1px solid #2a2a2a;
-}
-
-.metrics-section h3 {
-    color: #00d4ff;
-    margin-bottom: 16px;
-    font-size: 1.5rem;
-}
-
-.metrics-toolbar {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 18px;
-}
-
-.metrics-select {
-    background: #2a2a2a;
-    color: #e0e0e0;
-    border: 2px solid #3a3a3a;
-    padding: 10px 14px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.metrics-button {
-    background: #2a2a2a;
-    color: #00d4ff;
-    border: 2px solid #00d4ff;
-    padding: 10px 14px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.metrics-button:hover {
-    background: #00d4ff;
-    color: #000;
-}
-
-.metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px;
-}
-
-.metric-card {
-    background: #222;
-    border: 1px solid #3a3a3a;
-    border-radius: 10px;
-    padding: 16px;
-}
-
-.metric-title {
-    color: #aaa;
-    font-size: 0.9rem;
-    margin-bottom: 8px;
-}
-
-.metric-value {
-    color: #e0e0e0;
-    font-size: 1.6rem;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-}
-
-.metric-sub {
-    color: #888;
-    font-size: 0.9rem;
-    margin-top: 6px;
-}
-
-.metrics-status {
-    color: #888;
-    font-size: 0.9rem;
-    margin-top: 12px;
-}
-/* ------------------------------------------------------ */
 
 .input-section h3 {
     color: #00d4ff;
@@ -407,11 +401,17 @@ textarea::placeholder {
 }
 
 @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 10px rgba(0, 212, 255, 0.5); }
-    50% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.8); }
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+    }
 }
 
-.step-content { flex: 1; }
+.step-content {
+    flex: 1;
+}
 
 .step-content h4 {
     color: #e0e0e0;
@@ -419,12 +419,28 @@ textarea::placeholder {
     font-size: 1.1rem;
 }
 
-.step-item.active .step-content h4 { color: #00d4ff; }
-.step-item.completed .step-content h4 { color: #00ff88; }
+.step-item.active .step-content h4 {
+    color: #00d4ff;
+}
 
-.step-status { color: #888; font-size: 0.95rem; margin: 0; }
-.step-item.active .step-status { color: #00d4ff; animation: pulse-text 1.5s ease-in-out infinite; }
-.step-item.completed .step-status { color: #00ff88; }
+.step-item.completed .step-content h4 {
+    color: #00ff88;
+}
+
+.step-status {
+    color: #888;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.step-item.active .step-status {
+    color: #00d4ff;
+    animation: pulse-text 1.5s ease-in-out infinite;
+}
+
+.step-item.completed .step-status {
+    color: #00ff88;
+}
 
 @keyframes pulse-text {
     0%, 100% { opacity: 1; }
@@ -463,8 +479,14 @@ textarea::placeholder {
 }
 
 @keyframes slideIn {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .final-verdict.approved {
@@ -500,7 +522,9 @@ textarea::placeholder {
     gap: 20px;
 }
 
-.verdict-detail-row:last-child { border-bottom: none; }
+.verdict-detail-row:last-child {
+    border-bottom: none;
+}
 
 .verdict-label {
     color: #aaa;
@@ -525,7 +549,11 @@ textarea::placeholder {
     margin-top: 20px;
 }
 
-.rejection-code h4 { color: #ff4444; margin-bottom: 10px; }
+.rejection-code h4 {
+    color: #ff4444;
+    margin-bottom: 10px;
+}
+
 .rejection-code p {
     color: #ff8888;
     font-family: 'Courier New', monospace;
@@ -576,59 +604,47 @@ footer {
             </div>
         </section>
 
-        <!-- METRICS SECTION (added, does not affect the rest) -->
-        <section class="metrics-section">
-            <h3>Operational Metrics</h3>
+        <!-- ===================== METRICS SECTION (under Context + Equal Opportunity statement) ===================== -->
+        <section class="metrics-section" style="border-top:1px solid #333;">
+            <h3>📈 Live Metrics</h3>
 
             <div class="metrics-toolbar">
-                <select id="metricsWindow" class="metrics-select">
-                    <option value="1">Last 1 hour</option>
-                    <option value="6">Last 6 hours</option>
-                    <option value="24" selected>Last 24 hours</option>
-                    <option value="168">Last 7 days</option>
-                </select>
-                <button id="refreshMetricsButton" class="metrics-button">Refresh metrics</button>
-                <div id="metricsStatus" class="metrics-status">Loading…</div>
+                <div class="left">
+                    <span class="metrics-mini">Window</span>
+                    <select id="metricsWindow" class="metrics-select">
+                        <option value="1">Last 1h</option>
+                        <option value="6">Last 6h</option>
+                        <option value="24" selected>Last 24h</option>
+                        <option value="72">Last 3d</option>
+                        <option value="168">Last 7d</option>
+                        <option value="720">Last 30d</option>
+                    </select>
+                    <span id="metricsStatus" class="metrics-badge warn">⏳ Loading…</span>
+                </div>
+
+                <div class="right">
+                    <span class="small-muted">Auto-refresh: 15s</span>
+                </div>
             </div>
 
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-title">Avg end-to-end duration</div>
-                    <div id="m_avgDuration" class="metric-value">—</div>
-                    <div class="metric-sub">Seconds (Step Functions ExecutionTime)</div>
-                </div>
+            <div class="context-grid" id="metricsGrid">
+                <div class="context-item"><h4>Total Executions</h4><p class="metric-value" id="m_exec_total">—</p></div>
+                <div class="context-item"><h4>Succeeded</h4><p class="metric-value" id="m_exec_succeeded">—</p></div>
+                <div class="context-item"><h4>Failed</h4><p class="metric-value" id="m_exec_failed">—</p></div>
+                <div class="context-item"><h4>Timed Out</h4><p class="metric-value" id="m_exec_timedout">—</p></div>
 
-                <div class="metric-card">
-                    <div class="metric-title">Success rate</div>
-                    <div id="m_successRate" class="metric-value">—</div>
-                    <div class="metric-sub">Succeeded / Started</div>
-                </div>
+                <div class="context-item"><h4>Aborted</h4><p class="metric-value" id="m_exec_aborted">—</p></div>
+                <div class="context-item"><h4>Success Rate</h4><p class="metric-value" id="m_success">—</p></div>
+                <div class="context-item"><h4>Avg Execution Time</h4><p class="metric-value" id="m_avgdur">—</p></div>
+                <div class="context-item"><h4>Throughput</h4><p class="metric-value" id="m_tph">—</p></div>
 
-                <div class="metric-card">
-                    <div class="metric-title">Throughput</div>
-                    <div id="m_throughput" class="metric-value">—</div>
-                    <div class="metric-sub">Executions started per hour</div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-title">Approved</div>
-                    <div id="m_approved" class="metric-value">—</div>
-                    <div id="m_approvedSub" class="metric-sub">—</div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-title">Missing Info</div>
-                    <div id="m_missing" class="metric-value">—</div>
-                    <div id="m_missingSub" class="metric-sub">—</div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-title">Rejected</div>
-                    <div id="m_rejected" class="metric-value">—</div>
-                    <div id="m_rejectedSub" class="metric-sub">—</div>
-                </div>
+                <div class="context-item"><h4>Approved</h4><p class="metric-value" id="m_approved">—</p></div>
+                <div class="context-item"><h4>Missing Info</h4><p class="metric-value" id="m_missing">—</p></div>
+                <div class="context-item"><h4>Rejected</h4><p class="metric-value" id="m_rejected">—</p></div>
+                <div class="context-item"><h4>Notes</h4><p id="m_note" style="color:#ccc;">—</p></div>
             </div>
         </section>
+        <!-- ===================== END METRICS SECTION ===================== -->
 
         <section class="input-section">
             <h3>Application Inputs</h3>
@@ -739,20 +755,21 @@ footer {
 
     <script>
 /**
- * Enhanced version:
- * - Keeps your workflow UI logic untouched
- * - Adds a separate metrics fetch from a Metrics Lambda
+ * IMPORTANT:
+ * - Existing flow stays as-is (API Lambda /start and /status).
+ * - Metrics uses a separate Function URL (GET only):  {METRICS_BASE_URL}/metrics?windowHours=...
+ * - Metrics failures never break the main app.
  */
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-// CONFIG
-// 1) API Lambda v2 Function URL (start/status)
-const API_BASE_URL = "PASTE_API_LAMBDA_V2_FUNCTION_URL_HERE".replace(/\/$/, "");
+// CONFIG: API Lambda Function URL (UNCHANGED)
+const API_BASE_URL = "https://e4dju6jctiyrntr7hijshokdgu0mbgxi.lambda-url.eu-west-3.on.aws/".replace(/\/$/, "");
 
-// 2) Metrics Lambda Function URL (metrics)
-const METRICS_BASE_URL = "PASTE_METRICS_LAMBDA_FUNCTION_URL_HERE".replace(/\/$/, "");
+// CONFIG: Metrics Lambda Function URL (NEW) - PROVIDED BY YOU
+const METRICS_BASE_URL = "https://bxjbvw5jjdlicokrecqzhzdl4e0nlpji.lambda-url.eu-west-3.on.aws/".replace(/\/$/, "");
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+// Sample data for different scenarios (unchanged)
 const SAMPLE_SCENARIOS = {
     approved: {
         jobDescription: `Warehouse Associate - Forklift Operator
@@ -929,27 +946,18 @@ const candidateCVInput = document.getElementById('candidateCV');
 const screeningResponsesInput = document.getElementById('screeningResponses');
 
 // Metrics DOM
-const metricsWindowEl = document.getElementById("metricsWindow");
-const refreshMetricsButton = document.getElementById("refreshMetricsButton");
-const metricsStatusEl = document.getElementById("metricsStatus");
-
-const mAvgDuration = document.getElementById("m_avgDuration");
-const mSuccessRate = document.getElementById("m_successRate");
-const mThroughput = document.getElementById("m_throughput");
-const mApproved = document.getElementById("m_approved");
-const mApprovedSub = document.getElementById("m_approvedSub");
-const mMissing = document.getElementById("m_missing");
-const mMissingSub = document.getElementById("m_missingSub");
-const mRejected = document.getElementById("m_rejected");
-const mRejectedSub = document.getElementById("m_rejectedSub");
+const metricsWindowEl = document.getElementById('metricsWindow');
+const metricsStatusEl = document.getElementById('metricsStatus');
 
 // Event listeners
 startButton.addEventListener('click', startWorkflow);
 loadSampleButton.addEventListener('click', loadSampleData);
 clearButton.addEventListener('click', clearAllFields);
 
-refreshMetricsButton.addEventListener("click", () => refreshMetrics(true));
-metricsWindowEl.addEventListener("change", () => refreshMetrics(true));
+// Metrics listeners
+metricsWindowEl.addEventListener('change', () => {
+    refreshMetrics();
+});
 
 function clearAllFields() {
     jobDescriptionInput.value = '';
@@ -964,32 +972,39 @@ function clearAllFields() {
     startButton.textContent = 'START DEMO';
 
     clearButton.textContent = '✓ Cleared';
-    setTimeout(() => { clearButton.textContent = 'Clear All'; }, 1500);
+    setTimeout(() => {
+        clearButton.textContent = 'Clear All';
+    }, 1500);
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function loadSampleData() {
     const scenario = scenarioSelect.value;
+
     if (!scenario) {
         alert('Please select a scenario from the dropdown first!');
         return;
     }
+
     const sampleData = SAMPLE_SCENARIOS[scenario];
+
     jobDescriptionInput.value = sampleData.jobDescription;
     candidateCVInput.value = sampleData.candidateCV;
     screeningResponsesInput.value = sampleData.screeningResponses;
 
     const scenarioName = scenarioSelect.options[scenarioSelect.selectedIndex].text;
     loadSampleButton.textContent = '✓ Loaded: ' + scenarioName;
-    setTimeout(() => { loadSampleButton.textContent = 'Load Sample Data'; }, 3000);
+    setTimeout(() => {
+        loadSampleButton.textContent = 'Load Sample Data';
+    }, 3000);
 }
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// --- UI mapping helpers (unchanged) ---
+// --- NEW: robust UI mapping helpers (fixes "missing info" showing as rejected) ---
 function normalizeConfidence(v) {
     if (typeof v !== "number") return 0;
     return v <= 1 ? Math.round(v * 100) : Math.round(v);
@@ -1004,6 +1019,7 @@ function deriveUiCategory(finalData) {
         ? missing.filter(Boolean).map(x => String(x))
         : (missing ? [String(missing)] : []);
 
+    // Highest priority: Missing info / needs info
     if (
         missingList.length > 0 ||
         atsStatus.includes("needsinfo") ||
@@ -1018,10 +1034,12 @@ function deriveUiCategory(finalData) {
         return { category: "missing", label: "⚠ Missing Information / Clarification Required", missingList };
     }
 
+    // Rejected
     if (decision.includes("reject") || atsStatus.includes("reject")) {
         return { category: "rejected", label: "✗ Application Rejected", missingList };
     }
 
+    // Interview / invited / approved
     if (
         decision.includes("interview") ||
         decision.includes("schedule") ||
@@ -1032,12 +1050,102 @@ function deriveUiCategory(finalData) {
         return { category: "approved", label: "✓ Interview with HR Scheduled", missingList };
     }
 
+    // Fallback using score
     const score = typeof finalData.score === "number" ? finalData.score : 0;
     if (score >= 60) return { category: "approved", label: "✓ Interview with HR Scheduled", missingList };
     if (missingList.length > 0) return { category: "missing", label: "⚠ Missing Information / Clarification Required", missingList };
     return { category: "rejected", label: "✗ Application Rejected", missingList };
 }
-// --------------------------------------
+// -------------------------------------------------------------------------------
+
+/* ===================== METRICS (NEW) ===================== */
+function setMetricsStatus(kind, text) {
+    metricsStatusEl.className = 'metrics-badge ' + (kind || 'warn');
+    metricsStatusEl.textContent = text;
+}
+
+function fmtPct(p) {
+    if (typeof p !== "number" || Number.isNaN(p)) return "—";
+    return `${p}%`;
+}
+
+function safeText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+}
+
+function fmtCountWithPct(count, pct) {
+    if (typeof count !== "number") return "—";
+    if (typeof pct === "number") return `${count} (${pct}%)`;
+    return String(count);
+}
+
+async function refreshMetrics() {
+    const windowHours = parseInt(metricsWindowEl.value || "24", 10) || 24;
+
+    try {
+        setMetricsStatus('warn', '⏳ Loading…');
+
+        // IMPORTANT: keep GET simple (no headers) to avoid CORS preflight
+        const r = await fetch(`${METRICS_BASE_URL}/metrics?windowHours=${encodeURIComponent(windowHours)}`);
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(data.error || "metrics failed");
+
+        // This metrics lambda returns top-level fields (NOT data.execution / data.decisions.totalApplicationsInWindow)
+        const totalExecutions = typeof data.totalExecutions === "number" ? data.totalExecutions : 0;
+        const succeeded = typeof data.succeeded === "number" ? data.succeeded : 0;
+        const failed = typeof data.failed === "number" ? data.failed : 0;
+        const timedOut = typeof data.timedOut === "number" ? data.timedOut : 0;
+        const aborted = typeof data.aborted === "number" ? data.aborted : 0;
+
+        const successRatePercent = typeof data.successRatePercent === "number" ? data.successRatePercent : 0;
+        const avgExecTimeSeconds = typeof data.avgExecutionTimeSeconds === "number" ? data.avgExecutionTimeSeconds : 0;
+        const throughput = typeof data.throughputExecutionsPerHour === "number" ? data.throughputExecutionsPerHour : 0;
+
+        // Decision buckets (based on SUCCEEDED executions where S3 final was readable)
+        const decisions = data.decisions || {};
+        const approved = decisions.approved || {};
+        const missing = decisions.missingInfo || {};
+        const rejected = decisions.rejected || {};
+
+        safeText("m_exec_total", String(totalExecutions));
+        safeText("m_exec_succeeded", String(succeeded));
+        safeText("m_exec_failed", String(failed));
+        safeText("m_exec_timedout", String(timedOut));
+
+        safeText("m_exec_aborted", String(aborted));
+        safeText("m_success", `${successRatePercent}% (${succeeded}/${totalExecutions})`);
+        safeText("m_avgdur", `${avgExecTimeSeconds}s`);
+        safeText("m_tph", `${throughput} exec/hour`);
+
+        safeText("m_approved", fmtCountWithPct(approved.count ?? 0, approved.percentOfDecided ?? 0));
+        safeText("m_missing", fmtCountWithPct(missing.count ?? 0, missing.percentOfDecided ?? 0));
+        safeText("m_rejected", fmtCountWithPct(rejected.count ?? 0, rejected.percentOfDecided ?? 0));
+
+        // You asked: remove the explanatory sentence; we only show notes if present
+        safeText("m_note", data?.notes ? String(data.notes) : "—");
+
+        // Badge logic
+        if (totalExecutions === 0) {
+            setMetricsStatus('warn', 'ℹ️ No executions in window');
+        } else if (successRatePercent >= 90) {
+            setMetricsStatus('ok', '✅ Healthy');
+        } else if (successRatePercent >= 70) {
+            setMetricsStatus('warn', '⚠ Needs attention');
+        } else {
+            setMetricsStatus('err', '❌ Unhealthy');
+        }
+    } catch (e) {
+        console.warn("Metrics fetch failed:", e);
+        setMetricsStatus('err', '❌ Metrics fetch failed');
+        // Don't break the main app if metrics fails
+    }
+}
+
+// refresh on load + every 15s
+refreshMetrics();
+setInterval(refreshMetrics, 15000);
+/* ===================== END METRICS ===================== */
 
 async function startWorkflow() {
     const jobDescription = jobDescriptionInput.value.trim();
@@ -1094,6 +1202,7 @@ async function runWorkflowVisualization(jobDescription, cv, screeningResponses) 
         statusElement.textContent = '✓ Completed';
     }
 
+    // --- REAL BACKEND CALL (replaces simulateWorkflow) ---
     let startResp, startData;
     try {
         startResp = await fetch(`${API_BASE_URL}/start`, {
@@ -1123,6 +1232,7 @@ async function runWorkflowVisualization(jobDescription, cv, screeningResponses) 
     const executionArn = startData.executionArn;
     const applicationId = startData.applicationId;
 
+    // Poll status until done
     let finalData = null;
     for (;;) {
         await sleep(1500);
@@ -1141,6 +1251,7 @@ async function runWorkflowVisualization(jobDescription, cv, screeningResponses) 
             break;
         }
 
+        // expected backend field: applicationStatus
         if (sd.applicationStatus === "SUCCEEDED") {
             finalData = sd;
             break;
@@ -1152,29 +1263,30 @@ async function runWorkflowVisualization(jobDescription, cv, screeningResponses) 
         }
     }
 
+    // Map backend response into displayVerdict expected structure
     if (finalData) {
         const ui = deriveUiCategory(finalData);
 
-        const score = typeof finalData.score === "number" ? finalData.score : 0;
-        const conf = typeof finalData.confidence === "number" ? finalData.confidence : 0;
+        const score = typeof finalData.score === "number" ? finalData.score : (finalData.scoreDetails && typeof finalData.scoreDetails.score === "number" ? finalData.scoreDetails.score : 0);
+        const conf = typeof finalData.confidence === "number" ? finalData.confidence : (finalData.scoreDetails && typeof finalData.scoreDetails.confidence === "number" ? finalData.scoreDetails.confidence : 0);
 
         const result = {
             executionId: finalData.executionArn,
-            finalDecision: ui.label,
+            finalDecision: ui.label, // ensures correct color (yellow for missing)
             rejectionReasonCode: finalData.rejectionReasonCode || null,
             scoreDetails: {
                 score: score ?? 0,
                 scoreBand: (score >= 75 ? "high" : score >= 50 ? "medium" : "low"),
                 confidence: normalizeConfidence(conf ?? 0),
-                explanation: finalData.explanation || "",
+                explanation: finalData.explanation || (finalData.scoreDetails && finalData.scoreDetails.explanation) || "",
                 missingInfo: ui.missingList
             }
         };
 
         displayVerdict(result);
 
-        // Refresh metrics after a completed run (nice UX)
-        refreshMetrics(true);
+        // NEW: refresh metrics after a run (best-effort)
+        refreshMetrics();
     } else {
         startButton.disabled = false;
         startButton.textContent = "START DEMO";
@@ -1190,6 +1302,7 @@ function displayVerdict(result) {
 
     const fd = String(result.finalDecision || "");
 
+    // We now expect labels like: ✓ ... / ⚠ ... / ✗ ...
     if (fd.startsWith("✓")) {
         verdictClass = 'approved';
         verdictText = fd;
@@ -1258,77 +1371,6 @@ function displayVerdict(result) {
     startButton.disabled = false;
     startButton.textContent = 'START DEMO';
 }
-
-/* ---------------- METRICS FETCH (added, isolated) ---------------- */
-
-function fmtPct(p) {
-    return `${p.toFixed(1)}%`;
-}
-
-function fmtFrac(part, total) {
-    return `${part}/${total}`;
-}
-
-async function refreshMetrics(showErrors) {
-    const windowHours = parseInt(metricsWindowEl.value || "24", 10);
-
-    metricsStatusEl.textContent = "Loading…";
-
-    try {
-        const resp = await fetch(`${METRICS_BASE_URL}/metrics?windowHours=${encodeURIComponent(windowHours)}`, {
-            method: "GET",
-            headers: { "content-type": "application/json" }
-        });
-
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.error || "Metrics request failed");
-
-        const exec = data.execution || {};
-        const dec = data.decisions || {};
-
-        // Avg duration
-        mAvgDuration.textContent = (exec.avgEndToEndSeconds != null) ? `${exec.avgEndToEndSeconds}` : "—";
-
-        // Success rate
-        const sr = (exec.successRate != null) ? (exec.successRate * 100.0) : 0;
-        mSuccessRate.textContent = `${sr.toFixed(1)}%`;
-        mSuccessRate.title = `Succeeded ${exec.succeeded || 0} / Started ${exec.started || 0}`;
-
-        // Throughput
-        mThroughput.textContent = (exec.throughputPerHour != null) ? `${exec.throughputPerHour}` : "—";
-
-        // Decisions (Approved/Missing/Rejected)
-        const dTotal = dec.total || 0;
-
-        const a = (dec.approved && dec.approved.count) || 0;
-        const ap = (dec.approved && dec.approved.pct) || 0;
-        mApproved.textContent = `${ap.toFixed(1)}%`;
-        mApprovedSub.textContent = `${fmtFrac(a, dTotal)} Approved`;
-
-        const m = (dec.missingInfo && dec.missingInfo.count) || 0;
-        const mp = (dec.missingInfo && dec.missingInfo.pct) || 0;
-        mMissing.textContent = `${mp.toFixed(1)}%`;
-        mMissingSub.textContent = `${fmtFrac(m, dTotal)} Missing Info`;
-
-        const r = (dec.rejected && dec.rejected.count) || 0;
-        const rp = (dec.rejected && dec.rejected.pct) || 0;
-        mRejected.textContent = `${rp.toFixed(1)}%`;
-        mRejectedSub.textContent = `${fmtFrac(r, dTotal)} Rejected`;
-
-        metricsStatusEl.textContent = `Updated • window: last ${data.windowHours}h`;
-    } catch (e) {
-        metricsStatusEl.textContent = "Metrics unavailable (check Metrics URL / CORS / IAM)";
-        if (showErrors) {
-            alert("Metrics error: " + (e && e.message ? e.message : String(e)));
-        }
-    }
-}
-
-// Auto-refresh every 15s (safe: read-only)
-refreshMetrics(false);
-setInterval(() => refreshMetrics(false), 15000);
-
-/* --------------------------------------------------------------- */
 
 // Initialize
 console.log('🚀 Agentic Hiring Demo - Frontend Loaded');
