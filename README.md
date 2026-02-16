@@ -506,7 +506,7 @@ Using AWS Serverless + Bedrock + deterministic governance logic.
 
 ---
 
-FAQ1: An example of normalization 
+# FAQ1: An example of normalization 
 
 ## Summary Table
 
