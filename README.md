@@ -81,15 +81,17 @@ This solution introduces:
         |
         +--> 4E Fit Scoring (Deterministic + Bedrock rationale)
         |
-        +--> 4F Update ATS
+        +--> 4F Next Best actions
         |
-        +--> 4G Manage communication with candidate
+        +--> 4G Update ATS
         |
-        +--> 4H Schedule interviews
+        +--> 4H Manage communication with candidate
         |
-        +--> 4I Output metrics 
+        +--> 4I Schedule interviews
         |
-        +--> 4J Write Back to S3
+        +--> 4J Output metrics 
+        |
+        +--> 4K Write Back to S3
 ```
 
 ---
@@ -176,7 +178,7 @@ It standardizes the raw candidate submission into a structured and consistent `a
 
 ### Step 4C — Normalize & Dedupe
 
-The **Normalize and De-Duplicate** step ensures that repeated submissions of the same application (even with minor formatting differences) can be consistently identified.
+It ensures that repeated submissions of the same application (even with minor formatting differences) can be consistently identified.
 
 #### Normalization (Deterministic Text Canonicalization)
 
@@ -241,7 +243,7 @@ In production, this key would be persisted (e.g., in DynamoDB) and checked befor
 
 ### Step 4D — Structured Extraction (LLM)
 
-Uses **Amazon Bedrock (Claude Sonnet 4 via inference profile)** to extract structured JSON:
+It Uses **Amazon Bedrock (Claude Sonnet 4 via inference profile)** to extract structured JSON:
 
 ```json
 {
@@ -268,7 +270,7 @@ This step transforms unstructured text into structured evaluation fields.
 
 ---
 
-### Step 4D — Fit Scoring (Deterministic + LLM Rationale)
+### Step 4E — Fit Scoring (Deterministic + LLM Rationale)
 
 This is hybrid logic:
 
@@ -324,7 +326,9 @@ This ensures:
 
 ---
 
-### Step 4E — Next Best Action
+### Step 4F — Next Best Action
+
+This step applies a deterministic policy layer to translate the calculated `score`, `missingInfoList`, and `confidence` into a final operational decision. Based on explicit thresholds, it returns one of three outcomes: **Interview Scheduled**, **Missing Information / Clarification Required**, or **Rejected**. High scores (≥ 75) trigger an interview invitation; medium scores or missing must-have criteria trigger a clarification request; low scores or low confidence (< 0.6) result in rejection with a structured `rejectionReasonCode` and human-readable explanation. This step ensures that the final decision is rule-based, transparent, and auditable, with no opaque model-driven auto-rejections.
 
 Maps score + missing info into:
 
@@ -332,9 +336,21 @@ Maps score + missing info into:
 - Status label for UI
 - Reason codes (optional)
 
+### Step 4I Schedule Interviews (Simulated)
+
+This step represents the interview scheduling integration layer. In production, this would connect to a scheduling platform or calendar system to create interview slots. In demo mode, it simply returns a simulated scheduling result while preserving the expected response contract. This maintains architectural completeness of the orchestration while keeping the system fully self-contained.
+
 ---
 
-### Step 4F — Write Back to S3
+### Step 4J Output Metrics (Simulated)
+
+This step generates simulated operational KPIs representing how the workflow would be measured in production. It returns metrics such as `timeToFirstDecision`, `inviteToScheduleConversionRate`, `scheduleCompletionRate`, `humanReviewRate`, `queueLatency`, and `throughputPerMinute`, along with a `metricsStatus` flag set to `SIMULATED`. These values demonstrate how real hiring analytics would be surfaced without implementing a full analytics pipeline.
+
+---
+
+### Step 4K — Write Back to S3
+
+It persists the complete evaluation summary into the original application package stored in Amazon S3. It reads the existing object, appends a `final` section containing the `executionArn`, decision details, score, confidence, explanation, missing information, ATS status, communication results, scheduling outcome, and metrics, and then updates the application `status` to `COMPLETED`. This ensures full traceability, durable state storage, and audit-ready output for downstream systems or UI consumption.
 
 Stores:
 
@@ -506,7 +522,7 @@ Using AWS Serverless + Bedrock + deterministic governance logic.
 
 ---
 
-# FAQ1: An example of normalization 
+# FAQ1: Example: Normalization, De-Duplication, and Semantic Extraction (John Doe Case)
 
 ## Summary Table
 
