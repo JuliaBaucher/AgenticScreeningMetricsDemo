@@ -1,4 +1,4 @@
-# Agentic AI Screening Demo  
+# Agentic AI Screening Metric Demo  
 AI-Powered Candidate Screening Workflow using AWS Step Functions + Lambda + Bedrock
 
 ---
@@ -255,6 +255,8 @@ It Uses **Amazon Bedrock (Claude Sonnet 4 via inference profile)** to extract st
   "confidence": number
 }
 ```
+Confidence is a model-generated reliability estimate produced during the structured extraction step, reflecting how certain the LLM is about the accuracy and completeness of the extracted fields based on clarity, explicitness, and consistency of the input data (e.g., a CV stating “Forklift certified, 3 years of warehouse experience (2019–2022)” would likely yield high confidence, whereas “Worked in logistics for a while and handled equipment” would likely yield lower confidence due to ambiguity).
+
 
 Important:
 
