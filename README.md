@@ -569,8 +569,8 @@ When I submit an application, Step Functions executes a sequence of worker steps
 - **Load Job Context:** prepares job rules and a requirements schema derived from the job description, with versioning and audit flags.  
 - **Ingest Application Event:** normalizes the payload into a consistent `application` object for downstream steps.  
 - **Normalize & Dedupe:** canonicalizes the text and generates a deterministic dedupe key, which is how you would avoid reprocessing duplicates at scale.  
-- **Structured Extraction (LLM):** uses Bedrock / Claude to extract a strict JSON schema like years of experience, certification presence, skills, availability, and a confidence estimate. Temperature is set close to 0 for stable outputs.  
-- **Fit Scoring (Deterministic):** applies an explicit rubric tied to job requirements. This is important: the model does not decide the outcome — scoring is deterministic and auditable.  
+- **Structured Extraction (LLM):** uses Bedrock / Claude to extract a strict JSON schema like years of experience, certification presence, skills, availability, and a confidence estimate (based on user inputs understanding). Temperature is set close to 0 for stable outputs.  
+- **Fit Scoring (Deterministic):** assigning points for experience, required certification, availability, and a confidence factor. Final application status is determined by rule-based thresholds, accompanied by an LLM-generated summary explaining the outcome. This is important: the model does not decide the outcome — scoring is deterministic and auditable.  
 - **Next Best Action:** converts the score + missing info into one of three operational outcomes: interview scheduled, missing information request, or rejection. If rejected, it returns a structured **rejection reason code**.  
 - **ATS / Comms / Scheduling (Simulated):** these are stub steps that keep the contracts realistic without external dependencies.  
 - **Output Metrics (Simulated) + Write Back to S3:** we attach demo KPIs and persist the final package (decision, score, reasons, execution ARN) for auditability.
