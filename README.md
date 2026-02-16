@@ -344,9 +344,9 @@ This step represents the interview scheduling integration layer. In production, 
 
 ---
 
-### Step 4J Output Metrics (Simulated)
+### Step 4J Output Metrics 
 
-This step generates simulated operational KPIs representing how the workflow would be measured in production. It returns metrics such as `timeToFirstDecision`, `inviteToScheduleConversionRate`, `scheduleCompletionRate`, `humanReviewRate`, `queueLatency`, and `throughputPerMinute`, along with a `metricsStatus` flag set to `SIMULATED`. These values demonstrate how real hiring analytics would be surfaced without implementing a full analytics pipeline.
+This step handles execution and funnel metrics. Execution reliability, duration, and throughput are derived directly from Step Functions execution history, while funnel outcomes (Approved / Missing Info / Rejected) are computed from decision artifacts stored in S3; the metrics Lambda aggregates this data in real time and exposes it via a Function URL, which the UI fetches and renders dynamically
 
 ---
 
@@ -573,7 +573,8 @@ When I submit an application, Step Functions executes a sequence of worker steps
 - **Fit Scoring (Deterministic):** assigning points for experience, required certification, availability, and a confidence factor. Final application status is determined by rule-based thresholds, accompanied by an LLM-generated summary explaining the outcome. This is important: the model does not decide the outcome — scoring is deterministic and auditable.  
 - **Next Best Action:** converts the score + missing info into one of three operational outcomes: interview scheduled, missing information request, or rejection. If rejected, it returns a structured **rejection reason code**.  
 - **ATS / Comms / Scheduling (Simulated):** these are stub steps that keep the contracts realistic without external dependencies.  
-- **Output Metrics (Simulated) + Write Back to S3:** we attach demo KPIs and persist the final package (decision, score, reasons, execution ARN) for auditability.
+- **Write Back to S3:** stores all outcomes (decision, score, reasons, execution ARN) in the application package for auditability.
+- **Output Metrics (execution and funnel)** are computed in real time from Step Functions execution history and S3-stored decision data
 
 ### 5) Why this approach is compliant and production-oriented
 A major risk in hiring systems is “black box” decisioning. In this prototype:
