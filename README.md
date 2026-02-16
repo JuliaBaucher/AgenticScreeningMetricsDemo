@@ -536,3 +536,90 @@ Using AWS Serverless + Bedrock + deterministic governance logic.
 
 If you found this project useful, feel free to fork and extend it.
 
+# 30-Minute Oral Presentation Script (with live demo)
+
+Hi everyone, I’m Julia. For this interview challenge, I designed and built a working prototype of an **agentic screening system** for high-volume hourly hiring. The goal is to show a production-style workflow that can handle **10,000+ applications per week across 50+ locations**, triage candidates quickly, remain **auditable and compliant (EEOC / fair hiring)**, and preserve a strong candidate experience — while acknowledging recruiters cannot manually review every application.
+
+### 1) Problem framing and what “good” looks like
+In this context, the system must do four things well:  
+First, **speed** — reduce time-to-first-decision so qualified candidates move quickly through the funnel.  
+Second, **consistency** — apply the same criteria every time to avoid subjective drift across locations.  
+Third, **compliance and auditability** — every decision must be explainable with clear reason codes and an execution trace.  
+Fourth, **candidate experience** — if information is missing, we should request clarification instead of rejecting prematurely.
+
+### 2) What the agent has access to (and what I implemented in the demo)
+The problem statement mentions access to resumes, job descriptions, historical hiring outcomes, screening answers, scheduling, and an ATS. In this prototype, I implemented the realistic structure of those integrations while keeping the demo lightweight:
+- The system ingests **CV text**, **screening answers**, and the **job description**.
+- It runs **structured extraction** using an LLM to transform unstructured text into a consistent schema.
+- It performs **deterministic fit scoring** and a **policy-based next best action** decision.
+- It includes **stub integrations** for ATS update, candidate communications, and scheduling — returning realistic contract-compliant responses without calling external systems.
+- Finally, it writes a complete **audit package** to S3 so the output is durable and reviewable.
+
+### 3) System design and high-level architecture
+At a high level, the system has three layers:
+1) A lightweight **web UI** where a user pastes the CV, answers, and job description, and starts a run.  
+2) A serverless orchestration backend based on **AWS Step Functions**, with modular **Lambda workers** per step.  
+3) An observability and audit layer using **Step Functions execution history**, **CloudWatch logs/metrics**, and **S3 write-back** for final outcomes.
+
+The key design decision is that this is not a single prompt. It’s a **stateful multi-step workflow** that creates structured intermediate artifacts, applies deterministic policies, and logs everything for governance.
+
+### 4) Walkthrough of the workflow steps (what happens after I click “Start”)
+When I submit an application, Step Functions executes a sequence of worker steps:
+
+- **Load Job Context:** prepares job rules and a requirements schema derived from the job description, with versioning and audit flags.  
+- **Ingest Application Event:** normalizes the payload into a consistent `application` object for downstream steps.  
+- **Normalize & Dedupe:** canonicalizes the text and generates a deterministic dedupe key, which is how you would avoid reprocessing duplicates at scale.  
+- **Structured Extraction (LLM):** uses Bedrock / Claude to extract a strict JSON schema like years of experience, certification presence, skills, availability, and a confidence estimate. Temperature is set close to 0 for stable outputs.  
+- **Fit Scoring (Deterministic):** applies an explicit rubric tied to job requirements. This is important: the model does not decide the outcome — scoring is deterministic and auditable.  
+- **Next Best Action:** converts the score + missing info into one of three operational outcomes: interview scheduled, missing information request, or rejection. If rejected, it returns a structured **rejection reason code**.  
+- **ATS / Comms / Scheduling (Simulated):** these are stub steps that keep the contracts realistic without external dependencies.  
+- **Output Metrics (Simulated) + Write Back to S3:** we attach demo KPIs and persist the final package (decision, score, reasons, execution ARN) for auditability.
+
+### 5) Why this approach is compliant and production-oriented
+A major risk in hiring systems is “black box” decisioning. In this prototype:
+- The **LLM is constrained to extraction and explanation**, not eligibility decisions.  
+- The **decision logic is deterministic** and mapped to explicit requirement checks.  
+- Every rejection includes a **reason code** and a human-readable explanation aligned to the rubric.  
+- Step Functions provides an immutable execution trace, and S3 stores the final package to support audits and reviews.
+
+### 6) Candidate experience design
+Instead of rejecting on missing information, the policy explicitly supports “Missing Information / Clarification Required.” This improves conversion, reduces false negatives, and matches how recruiters work in reality. Even in demo mode, communications and scheduling are modeled so we preserve the end-to-end funnel logic.
+
+### 7) Prompting approach and iteration
+I used prompting in two places:
+- **Structured extraction prompt:** designed to output strictly valid JSON with a defined schema so it’s machine-consumable and safe.  
+- **Rationale generation prompt:** produces a short explanation that references the deterministic scoring outcome and missing items, capped to a few sentences.
+
+During iteration, the key improvements were enforcing strict JSON output, adding robust parsing, and keeping the LLM out of the decision boundary so the system remains predictable.
+
+### 8) Demo (screen share)
+Now I’ll show the prototype. I will:
+1) Paste a sample job description and candidate application.  
+2) Click “Start Demo” to launch an execution.  
+3) Show the live status while the workflow runs.  
+4) When completed, review the displayed output: execution ARN, structured extraction, score band, decision, and rejection code if applicable.  
+5) Optionally open Step Functions to show the execution graph and the intermediate state transitions for auditability.
+
+### 9) Success metrics (what we’d measure in production)
+In production, the key success metrics would be:
+- **Time to first decision** and end-to-end screening latency  
+- **Throughput** (applications processed per hour/day)  
+- **Success/failure rate** and error categories  
+- **Conversion rates**: invite-to-schedule, schedule completion  
+- **Human review rate** (bounded)  
+- **Fairness / compliance monitoring**: distribution of outcomes across locations and cohorts, plus audit sampling
+
+In this demo, I included simulated metrics to show how the KPI layer plugs in without building a full analytics pipeline.
+
+### 10) Roadmap: what’s built vs what’s next
+What’s built today is a complete end-to-end workflow with durable orchestration, deterministic decisioning, compliance-friendly outputs, and realistic integration stubs.  
+Next steps for a production rollout would be:
+- Replace stubs with real ATS, comms, and scheduling integrations  
+- Add historical hiring outcome signals and calibration of scoring thresholds  
+- Add human-in-the-loop gates for edge cases and low-confidence extractions  
+- Add automated fairness and bias monitoring dashboards  
+- Add scalable ingestion (S3/SQS) for true high-volume asynchronous processing
+
+### Closing
+To summarize: this prototype demonstrates a practical agentic screening architecture that is fast, modular, auditable, and designed for high-volume hourly hiring. The key is the separation of concerns: **LLM for semantic extraction**, **deterministic scoring and policy for decisions**, and **Step Functions for traceability and governance**. I’m happy to dive deeper into any component or walk through specific execution traces.
+
