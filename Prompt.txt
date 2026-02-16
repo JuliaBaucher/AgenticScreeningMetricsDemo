@@ -1,0 +1,59 @@
+#Take a role of experienced agentic AI systems Architect and AwS engineer.
+# Task: Write a detailed, step-by-step guideline for a non-technical user for the template-driven orchestration which is described below The guideline shoudl contain all configurations details, code, and anythign else that non tech user shoudl not to be able to implment this framework -include the source whihc the user can copy past in the AWS console code for all the functions - include all configurations and guideien how to create fucntions (lambda, step fucntion, ) - Include copy-paste commands (bash) where helpful - incude .json when needed --include Troubleshooting (non-technical): common errors: auth failure, permissions, workflow failed,
+
+
+#i want to build a prototype of the agentic ai application for hiring an hourly workforce. Here is the requirments
+
+
+##The entry point of the flow must be a page accessible via a Lambda Function URL where the user can paste the candidate CV, Candidate responses to screening questions, and job description as text and then click a central “Start Demo” button to launch a Step Functions execution. Upon submission, Lambda must receive these inputs as JSON, store them in an S3 bucket as a single application package, and start the Step Function using S3 references, with the first node loading the job description. When the execution completes, the same page must display the Step Functions execution ID (ARN) and the final decision on the candidate (Approved, Interview with HR scheduled, or Rejected), and if rejected, return a reason with a demo rejection code. The page must include a modern black-themed design with clear titles, centered primary action button 'START DEMO', textareas for CV, Candidate responses to screening questions, and job description, and a results panel showing execution status 'an icon running while the flow is executing', decision, and reason. Static explanatory text must present the prototype context: “Agentic Screening Demo — High-Volume Hourly Hiring,” describing scale (10,000+ applications per week across 50+ locations), goal (identify qualified candidates and move them through the funnel quickly), constraints (EEOC/fair hiring, auditability, candidate experience), and available signals (Candidate CV, Candidate responses to screening questions, and job description historical outcomes, scheduling system, ATS), along with an equal opportunity statement 'Fountain is proud to be an equal opportunity workplace. We welcome applicants of any educational background, gender identity and expression, sexual orientation, religion, ethnicity, age, socioeconomic status, disability, and veteran status.'and a note that the URL triggers a workflow run and polls Step Functions until completion while orchestration details remain visible in the Step Functions console.
+
+##it consumes CV, Candidate responses to screening questions, and job description    from S3 bucket. 
+
+
+## it handles high volume of application data so ingestion pipeline S3 - Lambda - SQS - step function.
+
+
+## the proposed flow:
+
+
+###Load job context (Job Description ). Inputs you already have at intake: jobId (or roleId) + locationId. What this step does: fetch the job description + requirement schema + location-specific rules (e.g., shift, pay band, certifications, language if job-relevant), plus the current version of the JD/ruleset. Outputs: jobDescription, requirementsSchema, rules, jdVersion
+
+###Ingest application event. Inputs: resume, screening Qs, location, role, availability
+
+###Normalize + de-dupe candidate applications: Prevent double-processing and repeated applicants
+
+### Structured extraction (LLM): Convert resume into a structured schema: role-relevant experience, tenure, keywords mapped to requirements, certifications, languages (if job-relevant), availability. Output includes: extracted fields + evidence snippets + confidence
+
+###Fit scoring (rules + calibrated heuristics). Use a simple scoring rubric tied to the job description (must-haves vs nice-to-haves). Output: score band + explanation + missing info list
+
+###Next-best-action policy (deterministic). If high score  → “invite to schedule”. If medium score or missing info → “ask follow-up questions”. If low confidence / unusual pattern / potential risk → “human review”
+
+###Action execution. Schedule interview (or send scheduling link) Or send a short SMS/email asking missing questions. Write back to ATS state. The nodes to perfrom these actions shoudl exist in the step fucntion but they are not connected to actual shceduling system, ats or email sender systems. hey jsut return the hardcoded message. After the decision step, implement three simulated integration nodes that always return hardcoded responses while preserving realistic contracts: first, ATS_UpdateApplicationStatus (stub) should return atsStatus (e.g., "InvitedToInterview", "NeedsInfo", "Rejected", or "Waitlist") and atsUpdateResult: "SIMULATED_OK"; second, Candidate_Comms (stub) should generate a decision-based message (e.g., "Email sent to request missing info", "Interview scheduling link sent", or "Rejection message sent") and return commsResult: "SIMULATED_OK" along with messageType ("missing_info", "schedule", or "rejection"); third, Scheduling (stub), only when applicable, should return schedulingResult: "SIMULATED_OK", scheduled (true/false), and scheduleMessage (e.g., "Interview scheduled" or "Link sent"). These stub steps preserve the structure of real integrations without calling external systems and keep the workflow coherent for demo purposes.
+### once the decision on the candidate is taken, the status on the candidate shoudl be addent to the 'application package of this candidate on S3 bucket'
+
+###Add a final node called “Measure_Outcomes (Simulated)” that returns hardcoded demo metrics such as timeToFirstDecision, inviteToScheduleConversionRate, scheduleCompletionRate, humanReviewRate (bounded), and queueLatency/throughput, marked with metricsStatus: "SIMULATED", to represent production KPIs without implementing real analytics calculations.  
+
+
+## the flow is executed from the exisitng  lamda fucntion URL where we integrate the ARN of the new step function. The lambda fucntion that execute step fucntin will send an inptu {} to step fucntion. The step fucntion should send the ouptut
+To integrate another Step Function into the existing Lambda URL trigger, the AI needs: Step Functions Execution ID (ARN):, Field name containing final decision (e.g., finalDecision, decision, outcome).IN case the final decision is taht cnadidate is rejected , the output contians of step fucntion should containt the Reason code why the candidate is rejected (its to  comply with EEOC and fair hiring régulations). 
+
+
+## once flow is executed , the step fucntion send Step Functions execution ID (ARN) and the final decision on the candidate (Approved, Interview with HR scheduled, or Rejected), and if rejected, return a reason with a demo rejection code to  the page accessible via a Lambda Function URL  (described at the beginning of this prompt)
+
+
+# This Framework shoudl be designed in a "fast Demo Mode” that enables a fully working end-to-end prototype without requiring Amazon Bedrock, a database and  or any real external system integrations. In this mode:
+- Structured extraction must run using deterministic, rule-based or simulated logic (no LLM dependency).
+- All external integrations (ATS update, candidate communications, scheduling, analytics) must be implemented as stub Lambda functions that return hardcoded but realistic contract-compliant responses.
+- The Step Functions workflow structure must remain identical to a production-ready version (same states, contracts, and data flow), even if the integrations are simulated.
+- No external APIs, credentials, or third-party systems are required to complete the demo.
+- The system must be able to process at least one sample job and one sample application end-to-end and produce a finalDecision and, if applicable, a rejectionReasonCode.
+
+
+
+
+
+
+
+
+
+

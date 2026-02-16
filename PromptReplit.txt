@@ -1,0 +1,38 @@
+Take a role of experienced Agentic AI Systems Architect and full-stack engineer. Your task is to build a working prototype of an agentic AI application for screening and progressing hourly workforce candidates, implemented entirely in a generic cloud-agnostic way so it can run on Replit without relying on any AWS services or vendor-specific components.
+
+The application must expose a web page as the single entry point, accessible via a public URL, where a user can paste three text inputs: candidate CV, candidate responses to screening questions, and job description. The page must include a central “START DEMO” button that launches the workflow execution. When the user clicks the button, the frontend must send the inputs as JSON to a backend API endpoint. The backend must store these inputs together as a single “application package” in a file-based storage layer (for example local files or a simple storage abstraction), then trigger an internal orchestration workflow engine that simulates a durable, multi-step process. When the workflow completes, the same page must display a unique execution ID, the final decision on the candidate (Approved, Interview with HR scheduled, or Rejected), and if rejected, a rejection reason code. While the workflow is running, the UI must display a visible “running” status indicator. The design must use a modern black theme, with clear titles, centered primary action button labeled “START DEMO,” textareas for each input, and a results panel showing execution status, decision, and reason. The page must also include static explanatory text describing the prototype context: “Agentic Screening Demo — High-Volume Hourly Hiring,” including scale assumptions (10,000+ applications per week across 50+ locations), objective (identify qualified candidates and move them through the funnel quickly), constraints (fair hiring, auditability, candidate experience), available signals (CV, screening answers, job description, historical outcomes, scheduling system, ATS), and an equal opportunity statement affirming non-discrimination across educational background, gender identity and expression, sexual orientation, religion, ethnicity, age, socioeconomic status, disability, and veteran status.
+
+in the UI page, there should be a button to load samples for these 3 scenario 
+
+Scenario 1: ✓ Interview Scheduled
+* Job: Warehouse Associate (forklift operator)
+* Candidate: John Martinez - 2 years experience, certified
+* Result: Score 100/100 → Green verdict
+Scenario 2: ⚠️ Missing Information
+* Job: Customer Service Representative
+* Candidate: Sarah Johnson - Limited experience, vague availability
+* Result: Score ~50-60 → Orange verdict with missing info list
+Scenario 3: ✗ Rejected
+* Job: Senior Software Engineer (requires 5+ years, Java/Python, cloud)
+* Candidate: Michael Chen - English major, learning Python for 3 months
+* Result: Score <30 → Red verdict with rejection code
+
+There should be a button to clear content.
+
+The system must be able to ingest CV, screening responses, and job description from the storage layer, simulating high-volume processing through an internal queue-based pipeline abstraction. The ingestion pipeline must conceptually include: storage layer → ingestion handler → message queue abstraction → workflow orchestrator, implemented generically using in-process logic or lightweight queue simulation rather than cloud services.
+
+The orchestrated workflow must include the following logical steps. First, load job context using the provided job description and simulated metadata such as roleId and locationId, returning jobDescription, requirementsSchema, rules, and a version identifier. Second, ingest the application event containing resume, screening answers, location, role, and availability. Third, normalize and de-duplicate candidate applications to prevent double processing. Fourth, perform structured extraction using deterministic or rule-based logic (no LLM dependency), converting the resume into a structured schema that captures role-relevant experience, tenure, keywords mapped to requirements, certifications, languages if job-relevant, availability, evidence snippets, and confidence score. Fifth, compute fit scoring using rule-based heuristics aligned with must-have versus nice-to-have criteria from the job description, producing a score band, explanation, and list of missing information. Sixth, apply a deterministic next-best-action policy: high score results in “invite to schedule,” medium score or missing information results in “ask follow-up questions,” and low confidence or unusual pattern results in “human review.” Seventh, execute simulated actions: update application status in a simulated ATS node returning atsStatus and atsUpdateResult set to “SIMULATED_OK”; send candidate communications in a simulated communications node returning commsResult “SIMULATED_OK” and messageType (“missing_info,” “schedule,” or “rejection”); and, when applicable, execute a simulated scheduling node returning schedulingResult “SIMULATED_OK,” scheduled flag, and scheduleMessage. These integrations must not call external systems but must preserve realistic data contracts. After the decision step, the final status must be written back into the candidate’s application package in storage.
+
+can you add the button whch alloors to clear content in the input placeholders so that i can clear content and generate content with load sample of data. 
+
+
+
+
+
+
+
+The workflow must also include a final node called “Measure_Outcomes (Simulated)” that returns hardcoded demo metrics such as timeToFirstDecision, inviteToScheduleConversionRate, scheduleCompletionRate, humanReviewRate within bounded limits, and queueLatency or throughput, clearly marked as simulated.
+
+The orchestration engine must generate and persist a unique execution ID for each run and return structured output containing executionId, finalDecision, and, if applicable, rejectionReasonCode to the frontend. If the candidate is rejected, the response must include a clear reason code to support fair hiring and auditability requirements. The frontend must poll or await workflow completion and then render the final results.
+
+The entire framework must be designed in a “Fast Demo Mode” that enables a fully working end-to-end prototype without requiring any external AI services, databases, credentials, or third-party integrations. Structured extraction must use deterministic logic only. All integrations must be simulated with hardcoded but contract-compliant responses. The workflow structure, step names, data contracts, and state transitions must mirror a production-ready architecture even though implementations are simulated. The system must be able to process at least one sample job and one sample application end-to-end and reliably produce a finalDecision and, when applicable, a rejectionReasonCode.
