@@ -624,3 +624,30 @@ Next steps for a production rollout would be:
 ### Closing
 To summarize: this prototype demonstrates a practical agentic screening architecture that is fast, modular, auditable, and designed for high-volume hourly hiring. The key is the separation of concerns: **LLM for semantic extraction**, **deterministic scoring and policy for decisions**, and **Step Functions for traceability and governance**. I’m happy to dive deeper into any component or walk through specific execution traces.
 
+# Presentation Script 
+For this interview challenge, I designed and built a working prototype of an agentic screening system for high-volume hourly hiring. The goal is to demonstrate a production-style workflow that can handle 10,000+ applications per week across 50+ locations, identify qualified candidates and move them through the funnel, comply with EEOC and fair hiring regulations, and preserve a strong candidate experience — while acknowledging that recruiters cannot manually review every application.
+
+Problem
+The challenge is to design an architecture that handles volume, speed, compliance, and user experience (for both recruiters and candidates).
+
+How it works:
+The user enters the job description, candidate CV, and answers to interview questions in the UI, and the system evaluates the application and provides a final decision: approved for interview, missing information, or rejected with a rejection reason. To facilitate the demo, there are predefined examples for each scenario. The system also returns execution and business metrics.
+
+I selected a serverless architecture with a lightweight front end hosted on GitHub and an AWS-based backend with storage on S3, orchestration through Step Functions, and LLM integration via Bedrock.
+
+Load Job Context: prepares job rules and a requirements schema derived from the job description, including versioning and audit flags.
+Ingest Application Event: normalizes the payload into a consistent application object for downstream steps.
+Normalize & Dedupe: canonicalizes the text and generates a deterministic dedupe key, which is how duplicates would be avoided at scale.
+Structured Extraction (LLM): uses Bedrock / Claude to extract a strict JSON schema including years of experience, certification presence, skills, availability, and a confidence estimate (based on the model’s understanding of user inputs). Temperature is set close to 0 for stable outputs.
+Fit Scoring (Deterministic): assigns points for experience, required certification, availability, and a confidence factor. The final application status is determined by rule-based thresholds, accompanied by an LLM-generated summary explaining the outcome. This is important: the model does not decide the outcome — scoring is deterministic and auditable.
+Next Best Action: converts the score and missing information into one of three operational outcomes: interview scheduled, missing information request, or rejection. If rejected, it returns a structured rejection reason code.
+ATS / Comms / Scheduling (Simulated): stub steps that keep contracts realistic without external dependencies.
+Write Back to S3: stores all outcomes (decision, score, reasons, execution ARN) in the application package for auditability.
+Output Metrics: execution and funnel metrics are computed in real time from Step Functions execution history and S3-stored decision data.
+
+This approach is compliant and production-oriented. It handles high volume thanks to AWS serverless architecture and supports multiple languages through LLM-based extraction. It provides deterministic evaluation of candidates based on scoring, and any rejection is accompanied by a structured reason code to comply with EEOC standards. The architecture anticipates integration with external systems for candidate communication, ATS updates, and interview scheduling.
+
+It is aligned with orchestration principles: execution authority through predefined steps; clear boundaries for LLM usage (the LLM is constrained to specific steps); durable memory and state management using S3 and Step Functions; fully traceable, controlled autonomy with the final decision available for human oversight; and full measurability with execution and business metrics available in the UI and in CloudWatch.
+
+Next steps: integrate external systems (scheduling, candidate communication, ATS), support voice input, implement richer business logic, add SQS for burst handling, introduce a database for configuration and persistence, and incorporate analytics tools.
+
