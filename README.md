@@ -538,7 +538,7 @@ If you found this project useful, feel free to fork and extend it.
 
 # 30-Minute Oral Presentation Script (with live demo)
 
-Hi everyone, I’m Julia. For this interview challenge, I designed and built a working prototype of an **agentic screening system** for high-volume hourly hiring. The goal is to show a production-style workflow that can handle **10,000+ applications per week across 50+ locations**, triage candidates quickly, remain **auditable and compliant (EEOC / fair hiring)**, and preserve a strong candidate experience — while acknowledging recruiters cannot manually review every application.
+For this interview challenge, I designed and built a working prototype of an **agentic screening system** for high-volume hourly hiring. The goal is to show a production-style workflow that can handle **10,000+ applications per week across 50+ locations**, triage candidates quickly, remain **auditable and compliant (EEOC / fair hiring)**, and preserve a strong candidate experience — while acknowledging recruiters cannot manually review every application.
 
 ### 1) Problem framing and what “good” looks like
 In this context, the system must do four things well:  
