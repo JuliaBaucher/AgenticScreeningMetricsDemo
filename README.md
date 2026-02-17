@@ -526,7 +526,6 @@ Using AWS Serverless + Bedrock + deterministic governance logic.
 
 # FAQ1: Example: Normalization, De-Duplication, and Semantic Extraction (John Doe Case)
 
-## Summary Table
 
 | Step | What It Does | Example (John Doe) | Example Output Type |
 |------|--------------|--------------------|--------------------|
@@ -534,7 +533,16 @@ Using AWS Serverless + Bedrock + deterministic governance logic.
 | Normalize / De-Dupe | Normalize content (canonicalize text + generate fingerprint) | `"JOHN DOE\n\nWorked in Warehouse..."` → `"john doe worked in warehouse..."`<br>Generates dedupe key: `a3f91c7b2e4d8f10` | Clean string + hash |
 | LLM Extraction | Understand meaning (semantic parsing into features) | Extracts structured fields:<br>`{ "years_experience": 3, "has_required_certification": true, "skills": ["warehouse operations", "forklift"], "availability": "night shifts", "confidence": 82 }` | Structured evaluation fields |
 
-If you found this project useful, feel free to fork and extend it.
+#FAQ 2: Example: Multii-language support
+
+| Step                        | What It Does                                                                                                                                                                                    | Example (Russian Inputs)                                                                                                                                                       | Example Output Type                                                                                                                                |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Load Job Context            | Reads the job description and builds a requirements schema (keyword-based in demo). With Russian JD, English keyword checks may not match, but job metadata and audit flags are still returned. | JD (RU): “Требуется складской работник… сертификат оператора вилочного погрузчика… ночные смены.” → English keyword checks (`forklift`, `warehouse`, `night`) may not trigger. | Structured job metadata:<br>`{ "jobId": "...", "locationId": "...", "requirementsSchema": { ... }, "jdVersion": "JD_DEMO_V1" }`                    |
+| Ingest Application Event    | Standardizes the payload structure into a consistent `application` object. Language is preserved as-is.                                                                                         | CV (RU): “Иван Петров… 4 года опыта на складе…”<br>Answers (RU): “Готов работать в ночные смены.”                                                                              | Clean JSON object:<br>`{ "application": { "cvText": "<RU text>", "screeningAnswersText": "<RU text>", "jobId": "...", "locationId": "..." } }`     |
+| Normalize & De-Dupe         | Canonicalizes text (lowercase + whitespace normalization) and generates a deterministic SHA-256 fingerprint to detect duplicates. Works regardless of language.                                 | `"ИВАН ПЕТРОВ\n\n4 ГОДА ОПЫТА"` → `"иван петров 4 года опыта"`<br>Generates dedupe key: `a3f91c7b2e4d8f10`                                                                     | Clean string + hash:<br>`{ "dedupeKey": "a3f91c7b2e4d8f10", "isDuplicate": false }`                                                                |
+| Structured Extraction (LLM) | Uses Bedrock / Claude to semantically interpret Russian text and map it into a fixed JSON schema with English field names.                                                                      | From RU CV + answers:<br>“4 года опыта… сертификат погрузчика… готов к ночным сменам.”                                                                                         | Structured evaluation fields:<br>`{ "years_experience": 4, "has_required_certification": true, "availability": "night shifts", "confidence": 88 }` |
+| Fit Scoring (Deterministic) | Applies numeric and boolean checks on extracted fields (language-agnostic) and computes score + decision based on thresholds.                                                                   | Extracted: `4 years`, `certification=true`, `availability confirmed`, `confidence=88` → Score = 100 → Interview Scheduled                                                      | Final decision object:<br>`{ "score": 100, "scoreBand": "high", "finalDecision": "Interview Scheduled" }`                                          |
+
 
 # 30-Minute Oral Presentation Script (with live demo)
 
