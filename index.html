@@ -1234,22 +1234,7 @@ async function runWorkflowVisualization(jobDescription, cv, screeningResponses) 
         { step: 9, duration: 1800 }
     ];
 
-    for (let i = 0; i < steps.length; i++) {
-        const stepInfo = steps[i];
-        const stepElement = document.querySelector(`.step-item[data-step="${stepInfo.step}"]`);
-        const statusElement = stepElement.querySelector('.step-status');
-
-        stepElement.classList.add('active');
-        statusElement.textContent = 'Processing...';
-
-        await sleep(stepInfo.duration);
-
-        stepElement.classList.remove('active');
-        stepElement.classList.add('completed');
-        statusElement.textContent = '✓ Completed';
-    }
-
-    // --- REAL BACKEND CALL ---
+    // --- REAL BACKEND CALL (moved BEFORE animation) ---
     let startResp, startData;
     try {
         startResp = await fetch(`${API_BASE_URL}/start`, {
@@ -1279,34 +1264,87 @@ async function runWorkflowVisualization(jobDescription, cv, screeningResponses) 
     const executionArn = startData.executionArn;
     const applicationId = startData.applicationId;
 
-    // Poll status until done
+    // Run animation while polling backend
     let finalData = null;
-    for (;;) {
-        await sleep(800);
+    let backendDone = false;
+    let backendError = null;
 
-        let st, sd;
-        try {
-            st = await fetch(`${API_BASE_URL}/status?executionArn=${encodeURIComponent(executionArn)}&applicationId=${encodeURIComponent(applicationId)}`);
-            sd = await st.json();
-        } catch (e) {
-            alert("Status error: failed to reach API.\n\n" + (e && e.message ? e.message : String(e)));
-            break;
+    const pollPromise = (async () => {
+        for (;;) {
+            let st, sd;
+            try {
+                st = await fetch(`${API_BASE_URL}/status?executionArn=${encodeURIComponent(executionArn)}&applicationId=${encodeURIComponent(applicationId)}`);
+                sd = await st.json();
+            } catch (e) {
+                backendError = "Status error: failed to reach API.\n\n" + (e && e.message ? e.message : String(e));
+                break;
+            }
+
+            if (!st.ok) {
+                backendError = "Status error: " + (sd.error || "Failed status");
+                break;
+            }
+
+            if (sd.applicationStatus === "SUCCEEDED") {
+                finalData = sd;
+                break;
+            }
+
+            if (["FAILED", "TIMED_OUT", "ABORTED"].includes(sd.applicationStatus)) {
+                backendError = "Workflow failed: " + (sd.errorMessage || sd.applicationStatus);
+                break;
+            }
+
+            await sleep(800); // unchanged polling interval from your current code
+        }
+        backendDone = true;
+    })();
+
+    const animationPromise = (async () => {
+        for (let i = 0; i < steps.length; i++) {
+            const stepInfo = steps[i];
+            const stepElement = document.querySelector(`.step-item[data-step="${stepInfo.step}"]`);
+            const statusElement = stepElement.querySelector('.step-status');
+
+            stepElement.classList.add('active');
+            statusElement.textContent = 'Processing...';
+
+            // sleep in smaller chunks so we can stop early if backend finishes
+            const chunk = 200;
+            let waited = 0;
+            while (waited < stepInfo.duration && !backendDone) {
+                await sleep(chunk);
+                waited += chunk;
+            }
+
+            stepElement.classList.remove('active');
+            stepElement.classList.add('completed');
+            statusElement.textContent = '✓ Completed';
+
+            if (backendDone) break;
         }
 
-        if (!st.ok) {
-            alert("Status error: " + (sd.error || "Failed status"));
-            break;
+        // If backend completed before animation, fast-forward remaining steps
+        if (backendDone) {
+            for (let s = 1; s <= 9; s++) {
+                const el = document.querySelector(`.step-item[data-step="${s}"]`);
+                if (!el) continue;
+                const stEl = el.querySelector('.step-status');
+                el.classList.remove('active');
+                el.classList.add('completed');
+                if (stEl) stEl.textContent = '✓ Completed';
+            }
         }
+    })();
 
-        if (sd.applicationStatus === "SUCCEEDED") {
-            finalData = sd;
-            break;
-        }
+    await pollPromise;
+    await animationPromise;
 
-        if (["FAILED", "TIMED_OUT", "ABORTED"].includes(sd.applicationStatus)) {
-            alert("Workflow failed: " + (sd.errorMessage || sd.applicationStatus));
-            break;
-        }
+    if (backendError) {
+        alert(backendError);
+        startButton.disabled = false;
+        startButton.textContent = "START DEMO";
+        return;
     }
 
     if (finalData) {
