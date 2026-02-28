@@ -420,6 +420,7 @@ textarea::placeholder {
 
 .step-content {
     flex: 1;
+    min-width: 0; /* helps text wrap in flex row on small screens */
 }
 
 .step-content h4 {
@@ -485,6 +486,7 @@ textarea::placeholder {
     border-radius: 12px;
     margin-bottom: 20px;
     animation: slideIn 0.5s ease-out;
+    word-break: break-word;
 }
 
 @keyframes slideIn {
@@ -548,6 +550,7 @@ textarea::placeholder {
     flex: 1;
     text-align: right;
     word-break: break-word;
+    min-width: 0;
 }
 
 .rejection-code {
@@ -568,6 +571,7 @@ textarea::placeholder {
     font-family: 'Courier New', monospace;
     font-size: 1.1rem;
     font-weight: 600;
+    word-break: break-word;
 }
 
 footer {
@@ -577,6 +581,160 @@ footer {
     color: #666;
     font-size: 0.9rem;
     border-top: 1px solid #2a2a2a;
+}
+
+/* ===== Mobile responsiveness (added) ===== */
+
+/* Make form controls behave predictably on mobile */
+select, button, textarea {
+    max-width: 100%;
+}
+
+/* Prevent iOS zoom when tapping inputs (only if font < 16px would trigger zoom) */
+textarea, select, button {
+    font-size: 16px;
+}
+
+/* Slightly tighter layout on tablets/smaller laptops */
+@media (max-width: 900px) {
+    body { padding: 14px; }
+    header { padding: 28px; }
+    section { padding: 28px; }
+    header h1 { font-size: 2.1rem; }
+}
+
+/* Phone layout */
+@media (max-width: 600px) {
+    body { padding: 12px; }
+
+    header { padding: 20px; }
+    section { padding: 18px; }
+
+    header h1 { font-size: 1.8rem; }
+    header h2 { font-size: 1rem; }
+
+    .context-grid {
+        grid-template-columns: 1fr; /* single column cards */
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .context-item { padding: 16px; }
+
+    /* Metrics toolbar: stack so the select isn't squeezed */
+    .metrics-toolbar {
+        align-items: stretch;
+        gap: 10px;
+    }
+    .metrics-toolbar .left,
+    .metrics-toolbar .right {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .metrics-toolbar .left {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .metrics-toolbar .right {
+        justify-content: flex-start;
+    }
+    .metrics-select {
+        width: 100%;
+        min-width: 0;   /* important: remove hard min width on small screens */
+        padding: 12px 14px;
+    }
+    .metrics-badge {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Buttons & sample controls: stack vertically, full width */
+    .button-container {
+        gap: 16px;
+        margin-top: 24px;
+        align-items: stretch;
+    }
+    .primary-button {
+        width: 100%;
+        padding: 16px 18px;
+        font-size: 1.05rem;
+    }
+
+    .sample-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .scenario-select {
+        width: 100%;
+        min-width: 0;   /* critical: fixes "squeezed" select and invisible placeholder */
+        padding: 14px 14px;
+        font-size: 16px; /* ensure no iOS zoom and better readability */
+    }
+
+    .secondary-button,
+    .clear-button {
+        width: 100%;
+        padding: 14px 14px;
+        font-size: 1rem;
+    }
+
+    /* Workflow steps: allow wrapping */
+    .step-item {
+        padding: 16px;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .step-number {
+        width: 44px;
+        height: 44px;
+        font-size: 1.25rem;
+        margin-right: 0;
+    }
+    .step-content h4 { font-size: 1.02rem; }
+
+    /* Verdict: reduce huge typography and stack details */
+    .verdict-section {
+        padding: 18px;
+        margin: 24px 0;
+    }
+    .verdict-section h3 {
+        font-size: 1.4rem;
+        letter-spacing: 2px;
+        margin-bottom: 18px;
+    }
+    .final-verdict {
+        font-size: 1.3rem;
+        padding: 16px;
+    }
+
+    .verdict-detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 12px;
+    }
+    .verdict-label {
+        flex: none;
+        width: 100%;
+        text-align: left;
+    }
+    .verdict-value {
+        width: 100%;
+        text-align: left;
+    }
+
+    footer { padding: 18px; }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+    header h1 { font-size: 1.6rem; }
+    .primary-button { font-size: 1rem; }
+    .scenario-select { padding: 12px 12px; }
 }
     </style>
 </head>
